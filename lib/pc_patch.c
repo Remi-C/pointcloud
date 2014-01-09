@@ -432,3 +432,68 @@ pc_patch_from_patchlist(PCPATCH **palist, int numpatches)
 	return (PCPATCH*)paout;
 }
 
+/**
+ * This function remove some of the dimension of the patch to keep only those asked
+ * (temporary test : keeping only x y z dimension)
+ */
+PCPATCH* pc_patch_reduce_dimension(PCPATCH *patch)
+{
+	//switch on patch compression type
+	//@TODO : only dimensionnal supported
+	
+	switch ( patch->type )
+	{
+	case PC_NONE:
+	{
+		pcerror("%s: error : trying to reduce dimension of a non dimensionnal-compressed patch, not yet supported", __func__);
+	 
+		break;
+	}
+	case PC_GHT:
+	{
+			pcerror("%s: error : trying to reduce dimension of a non dimensionnal-compressed patch, not yet supported", __func__);
+		 
+		break;
+	}
+	case PC_DIMENSIONAL:
+	{
+		
+			//get dimension number from name for "X", "Y", "Z" into an array of int : 1,2,3 in test data
+				//create array of int of size 3 
+				// get dimension position from dimension name into int array
+				int dim_position[3] = { 1,2,3 };
+				int new_dim_number = 3; 
+
+			//clone the patch into a new patch, without cloning data
+				PCPATCH_DIMENSIONAL *o_patch = pcalloc(sizeof(PCPATCH_DIMENSIONAL));
+				memcpy(o_patch, patch, sizeof(PCPATCH_DIMENSIONAL));
+				o_patch->bytes = pcalloc(patch-> new_dim_number  * sizeof(PCBYTES));
+				o_patch->npoints =  patch->npoints;
+				o_patch->stats = o_patch->stats;
+			
+			//file the bytes , allocating when necessary :
+			for ( i = 0; i < new_dim_number; i++ )
+				{
+					o_patch->bytes[i] = patch->bytes[i];
+				}
+			
+			pcerror("%s: error : function not yet completed !", __func__);
+			
+	}
+	default:
+		pcerror("%s: failure", __func__);
+	}
+		
+}
+
+
+
+
+
+
+
+
+
+
+
+

@@ -18,6 +18,7 @@ Datum pcpoint_get_value(PG_FUNCTION_ARGS);
 Datum pcpatch_from_pcpoint_array(PG_FUNCTION_ARGS);
 Datum pcpatch_from_pcpatch_array(PG_FUNCTION_ARGS);
 Datum pcpatch_uncompress(PG_FUNCTION_ARGS);
+Datum pcpatch_subset(PG_FUNCTION_ARGS);
 Datum pcpatch_numpoints(PG_FUNCTION_ARGS);
 Datum pcpatch_compression(PG_FUNCTION_ARGS);
 Datum pcpatch_intersects(PG_FUNCTION_ARGS);
@@ -524,6 +525,25 @@ Datum pcpatch_uncompress(PG_FUNCTION_ARGS)
 	SERIALIZED_PATCH *serpa_out = pc_patch_serialize_to_uncompressed(patch);
 	pc_patch_free(patch);
 	PG_RETURN_POINTER(serpa_out);
+}
+
+//added by Remi-C @CHECK @TEST @WARNING @DEV
+PG_FUNCTION_INFO_V1(pcpatch_subset);
+Datum pcpatch_subset(PG_FUNCTION_ARGS)
+{
+		//do like uncompress, for test purpose
+	
+		SERIALIZED_PATCH *serpa = PG_GETARG_SERPATCH_P(0);
+		PCSCHEMA *schema = pc_schema_from_pcid(serpa->pcid, fcinfo);
+		PCPATCH *patch = pc_patch_deserialize(serpa, schema);
+
+	//keeping only asked dimension 
+		PCPATCH *patch_output = pc_patch_reduce_dimension(patch);
+		//@WARNING @TODO : the patch should be compressed.
+		SERIALIZED_PATCH *serpa_out = pc_patch_serialize_to_uncompressed(patch_output);
+		pc_patch_free(patch);
+		PG_RETURN_POINTER(serpa_out);
+	
 }
 
 PG_FUNCTION_INFO_V1(pcpatch_numpoints);
