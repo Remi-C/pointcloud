@@ -166,7 +166,8 @@ int pc_dimstats_update(PCDIMSTATS *pds, const PCPATCH_DIMENSIONAL *pdl);
 /** Free the PCDIMSTATS memory */
 void pc_dimstats_free(PCDIMSTATS *pds);
 char* pc_dimstats_to_string(const PCDIMSTATS *pds);
-
+/** allocate memory and clone content of input pcdimstat to output pcdimstat */
+PCDIMSTAT * pc_dimstat_clone( PCDIMSTAT * );
 
 /****************************************************************************
 * PATCHES

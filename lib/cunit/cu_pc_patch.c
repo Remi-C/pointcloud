@@ -509,6 +509,98 @@ test_patch_filter()
 
 }
 
+
+/**
+* Test the function which clone a patch keeping only a part of dimensions
+*/
+static void
+test_patch_subset()
+{
+    int i;
+    int npts = 20;
+    PCPOINTLIST *pl1,*pl2 ;
+    PCPATCH_UNCOMPRESSED *pu1, *pu2;
+    PCPATCH *pa1, *pa2, *pa3, *pa4;
+    PCDIMSTATS *pds = NULL;
+    size_t z1, z2;
+    uint8_t *wkb1, *wkb2;
+    char *str1;
+
+	//getting a test patch
+	
+    pl1 = pc_pointlist_make(npts);
+    pl2 = pc_pointlist_make(npts);
+
+    for ( i = 0; i < npts; i++ )
+    {
+        PCPOINT *pt1 = pc_point_make(simpleschema);
+        PCPOINT *pt2 = pc_point_make(simpleschema);
+        pc_point_set_double_by_name(pt1, "x", i);
+        pc_point_set_double_by_name(pt1, "y", i);
+        pc_point_set_double_by_name(pt1, "Z", i*0.1);
+        pc_point_set_double_by_name(pt1, "intensity", 100-i);
+        pc_pointlist_add_point(pl1, pt1);
+        pc_point_set_double_by_name(pt2, "x", i);
+        pc_point_set_double_by_name(pt2, "y", i);
+        pc_point_set_double_by_name(pt2, "Z", i*0.1);
+        pc_point_set_double_by_name(pt2, "intensity", 100-i);
+        pc_pointlist_add_point(pl2, pt2);
+    }
+
+    // PCPATCH* pc_patch_filter(const PCPATCH *pa, uint32_t dimnum, PC_FILTERTYPE filter, double val1, double val2);
+
+    pa1 = (PCPATCH*)pc_patch_dimensional_from_pointlist(pl1);
+     
+    printf("pa1\n%s\n", pc_patch_to_string(pa1));
+    
+     CU_ASSERT(0 == 0);
+    
+    //testing the function :
+    printf("testing the dimension-reduction function\n");
+    printf("\n\n	position of x : %i \n\n",pc_schema_get_dimension_position_by_name(pa1->schema, "x"));
+    uint32_t new_dim_number = 2; 
+	char *dim_to_keep[] = { "x", "Z"}; 
+	uint32_t dim_position[3];
+	int i2 ;
+		for(i2=0;i2<new_dim_number;i2++)
+		{
+			dim_position[i2] = pc_schema_get_dimension_position_by_name(pa1->schema, dim_to_keep[i2]);
+			printf("\n dimension %s has position %d",dim_to_keep[i2],dim_position[i2] );
+		}
+	printf("\n");
+	
+    //testing dimstat function :
+		//creating dimstats
+		pds = pc_dimstats_make(simpleschema);
+		pc_dimstats_update(pds, (PCPATCH_DIMENSIONAL*)pa1);
+		//testing function : 
+		//PCDIMSTATS * o_dimstats = pc_dimstats_clone_subset(pds,dim_position, new_dim_number);
+	
+	//testing reduce_dimension function
+    pa3 = pc_patch_reduce_dimension(pa1, dim_to_keep, new_dim_number);
+    
+    
+    CU_ASSERT(0 == 1);
+    return;
+		//test on schema :
+		
+		
+		
+	printf("%s",pc_schema_to_json(pa3->schema ));
+     printf("pa1\n%s\n", pc_patch_to_string(pa3));
+    
+    //cleaning
+    pc_pointlist_free(pl1);
+    pc_pointlist_free(pl2);
+    pc_patch_free(pa1);
+    pc_patch_free(pa3);
+    //pc_patch_free(pa4);
+    //pc_patch_free(pa2);
+    
+    return;
+
+}
+
 /* REGISTER ***********************************************************/
 
 CU_TestInfo patch_tests[] = {
@@ -521,6 +613,7 @@ CU_TestInfo patch_tests[] = {
 	PC_TEST(test_patch_union),
 	PC_TEST(test_patch_wkb),
 	PC_TEST(test_patch_filter),
+	PC_TEST(test_patch_subset),
 	CU_TEST_INFO_NULL
 };
 

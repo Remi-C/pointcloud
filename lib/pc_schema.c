@@ -204,6 +204,42 @@ pc_schema_clone(const PCSCHEMA *s)
 	pc_schema_calculate_byteoffsets(pcs);
 	return pcs;
 }
+/**
+ * @param schema we want to partially clone
+ * @param an array with the position of the dimension we want to *keep*
+ * @param the total number of dimension we want to keep
+ * @return a cloned schema with only the dimension whose position are provided, the new position of dimension is there index+1 in provided array, NULL if something wen wrong
+ * */
+PCSCHEMA * 
+pc_schema_clone_subset(const PCSCHEMA *s, uint32_t * dimensions_position_array, uint32_t dimensions_number)
+{
+	
+	int i;
+	PCDIMENSION* temp_dim;
+	PCSCHEMA *pcs = pc_schema_new(dimensions_number);
+	pcs->pcid = s->pcid;
+	pcs->srid = s->srid;
+	pcs->x_position = s->x_position;
+	pcs->y_position = s->y_position;
+	pcs->compression = s->compression;
+	
+	printf("\n for loop \n");
+	for ( i = 0; i < dimensions_number; i++ )
+	{
+		if ( s->dims[dimensions_position_array[i]] )
+		{
+				temp_dim = pc_dimension_clone(s->dims[dimensions_position_array[i]]);//cloning the dimension
+				temp_dim->position=i ; //changing the position so to have continuous dimension position
+				
+			pc_schema_set_dimension(pcs,temp_dim);
+			printf("cloning the dimension %s in new position %d",temp_dim->name,i);
+		}
+	}
+	printf("\n end of for loop \n");
+	pc_schema_calculate_byteoffsets(pcs);
+	printf("finishing byteoffset calculation \n");
+	return pcs;
+}
 
 
 /** Release the memory behind the PCSCHEMA struct */
@@ -609,6 +645,24 @@ pc_schema_get_dimension_by_name(const PCSCHEMA *s, const char *name)
 		return NULL;
 
 	return hashtable_search(s->namehash, name);
+}
+
+/**
+ * This function returns the position of a dimension of the given name, or -1 if there is no dimension of the given name
+ * 
+ * */
+uint32_t 
+pc_schema_get_dimension_position_by_name(const PCSCHEMA *s, const char *name)
+{
+		PCDIMENSION * temp ; 
+		temp = pc_schema_get_dimension_by_name(s, name);
+		if(temp == NULL) {
+			return -1;
+		}
+		else {
+			return temp->position;
+		}
+		
 }
 
 size_t

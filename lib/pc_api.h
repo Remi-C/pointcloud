@@ -251,8 +251,8 @@ char* hexbytes_from_bytes(const uint8_t *bytebuf, size_t bytesize);
 uint32_t wkb_get_pcid(const uint8_t *wkb);
 /** Build an empty #PCDIMSTATS based on the schema */
 PCDIMSTATS* pc_dimstats_make(const PCSCHEMA *schema);
-
-
+/** Clone a given dimstats, only keeping the dimension in array of dimension. Dimensions position are changed and are equal to there index in input array*/
+PCDIMSTATS * pc_dimstats_clone_subset(const PCDIMSTATS *, uint32_t *, uint32_t);
 
 /**********************************************************************
 * SCHEMAS
@@ -278,7 +278,10 @@ void pc_schema_set_dimension(PCSCHEMA *s, PCDIMENSION *d);
 void pc_schema_check_xy(PCSCHEMA *s);
 /** Get the width in bytes of a single point in the schema */
 size_t pc_schema_get_size(const PCSCHEMA *s);
-
+/** Get the position of a dimension based on its name, -1 if no dimension named like asked*/
+uint32_t pc_schema_get_dimension_position_by_name(const PCSCHEMA *, const char *);
+/** create a clone of the schema with only a part of dimension*/
+PCSCHEMA * pc_schema_clone_subset(const PCSCHEMA *, uint32_t *, uint32_t );
 
 /**********************************************************************
 * PCPOINTLIST
@@ -420,6 +423,6 @@ PCPATCH* pc_patch_filter_equal_by_name(const PCPATCH *pa, const char *name, doub
 /** Subset batch based on range condition on dimension */
 PCPATCH* pc_patch_filter_between_by_name(const PCPATCH *pa, const char *name, double val1, double val2);
 
-/** Subset of a patch by reducing the number of dimension*/
-PCPATCH* pc_patch_reduce_dimension(PCPATCH *patch);
+/** Subset of a patch by reducing the number of dimension, the name of dimension to keep are in array, the total number of dimension to keep is also to provide*/
+PCPATCH* pc_patch_reduce_dimension(PCPATCH *, char **, uint32_t);
 #endif /* _PC_API_H */

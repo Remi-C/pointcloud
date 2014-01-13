@@ -540,8 +540,11 @@ Datum pcpatch_subset(PG_FUNCTION_ARGS)
 	//keeping only asked dimension 
 		PCPATCH *patch_output = pc_patch_reduce_dimension(patch);
 		//@WARNING @TODO : the patch should be compressed.
-		SERIALIZED_PATCH *serpa_out = pc_patch_serialize_to_uncompressed(patch_output);
+		SERIALIZED_PATCH *serpa_out = pc_patch_serialize(patch_output, NULL);
+		
+		
 		pc_patch_free(patch);
+		pc_patch_free(patch_output);
 		PG_RETURN_POINTER(serpa_out);
 	
 }

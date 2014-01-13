@@ -139,3 +139,53 @@ pc_dimstats_update(PCDIMSTATS *pds, const PCPATCH_DIMENSIONAL *pdl)
 	return PC_SUCCESS;
 }
 
+/**
+ * @param a dimstat (singular! ) to clone, inlcuding new memory allocation
+ * @return return a copy of the input dimstat, on own memory
+ * */
+PCDIMSTAT * 
+pc_dimstat_clone( PCDIMSTAT * input_dimstat)
+{
+	PCDIMSTAT *pds;
+	pds = pcalloc(sizeof(PCDIMSTAT));
+	
+	pds->total_runs = input_dimstat->total_runs ;
+	pds->total_commonbits = input_dimstat->total_commonbits;
+	pds->recommended_compression = input_dimstat->recommended_compression;
+	
+	return pds;
+}
+
+/** 
+ * @param the dimstats we want to partially clone
+ * @param an array containng the position of the dimension we want to keep
+ * @param the total number of dimensions we want to keep
+ * @return a new dimstats object with only stats for dimension in array, stats are newly numbered foloowing the index of the dimension in the array
+ * */
+PCDIMSTATS * 
+pc_dimstats_clone_subset(const PCDIMSTATS * d, uint32_t * dimensions_position_array, uint32_t dimensions_number)
+{
+	//Allocating new memory for the clone
+	PCDIMSTATS *pds;
+	int i;
+	pds = pcalloc(sizeof(PCDIMSTATS));
+	pds->ndims = dimensions_number;
+	pds->stats = pcalloc(pds->ndims * sizeof(PCDIMSTAT));
+	
+	//loop on stat to copy content
+	for ( i = 0; i < dimensions_number; i++ )
+	{
+		if ( sizeof(d->stats[dimensions_position_array[i]]) != 0L)
+		{
+				printf("\n dimension position array : %d \n",dimensions_position_array[i]);
+				
+			//	pds->stats[i] = pc_dimstat_clone( d->stats[dimensions_position_array[i]] ); 
+				
+			printf("cloning the stat %d in new position %d",dimensions_position_array[i],i);
+		}
+	}
+	
+	return pds;
+}
+
+

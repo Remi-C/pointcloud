@@ -433,13 +433,49 @@ pc_patch_from_patchlist(PCPATCH **palist, int numpatches)
 }
 
 /**
- * This function remove some of the dimension of the patch to keep only those asked
- * (temporary test : keeping only x y z dimension)
+ * @param
+ * @param
+ * @param
+ * @return the input patch with less dimensions, only dimension keept are these in provided array 
  */
-PCPATCH* pc_patch_reduce_dimension(PCPATCH *patch)
+PCPATCH * 
+pc_patch_reduce_dimension(PCPATCH *patch, char ** dim_to_keep, uint32_t dimensions_number)
 {
 	//switch on patch compression type
 	//@TODO : only dimensionnal supported
+	
+	/** pseudo code of the function
+	 * test code : will be removed 
+	 * switch to adapt strategy based on compression type
+		* 	case dimensionnal compression:
+		* 		
+	*/
+	PCPATCH *paout;
+	
+	
+	//get dimension number from name for "X", "Y", "Z" into an array of int 
+		//create array of int of size 3 
+		// get dimension position from dimension name into int array
+		uint32_t new_dim_number = 2; 
+		//char *dim_to_keep[] = { "x", "Z"};
+		uint32_t dim_position[3] = { -1,-1 };
+		
+		/*
+		int i2 ;
+		for(i2=0;i2<new_dim_number;i2++)
+		{
+			dim_position[i2] = pc_schema_get_dimension_position_by_name(patch->schema, dim_to_keep[i2]);
+			printf("\n dimension %s has position %d",dim_to_keep[i2],dim_position[i2] );
+		}
+		printf("\n");
+		*/
+		int i2 ;
+		for(i2=0;i2<dimensions_number;i2++)
+		{
+			dim_position[i2] = pc_schema_get_dimension_position_by_name(patch->schema, dim_to_keep[i2]);
+			printf("\n dimension %s has position %d",dim_to_keep[i2],dim_position[i2] );
+		}
+		printf("\n");
 	
 	switch ( patch->type )
 	{
@@ -458,32 +494,96 @@ PCPATCH* pc_patch_reduce_dimension(PCPATCH *patch)
 	case PC_DIMENSIONAL:
 	{
 		
-			//get dimension number from name for "X", "Y", "Z" into an array of int : 1,2,3 in test data
-				//create array of int of size 3 
-				// get dimension position from dimension name into int array
-				int dim_position[3] = { 1,2,3 };
-				int new_dim_number = 3; 
+			PCSCHEMA* temp_schema;
+			
+			//we create a new version of the patch with less dimension
+			PCPATCH_DIMENSIONAL *o_patch = pcalloc(sizeof(PCPATCH_DIMENSIONAL));
+					//cloning the patch structure
+					memcpy(o_patch, patch, sizeof(PCPATCH_DIMENSIONAL));
+					//cloning the schema with a subset of dimension
+						o_patch->schema =  pc_schema_clone_subset(patch->schema, dim_position, new_dim_number);
+					
+					printf("\n schema to json : %s \n",pc_schema_to_json(o_patch->schema), new_dim_number);//test  :
+					
+					//cloning the dimstats with a subset of dimension
+					
+					//cloning the bytes with a subset of dimension
+				
+				//checking the validity of patch
 
 			//clone the patch into a new patch, without cloning data
-				PCPATCH_DIMENSIONAL *o_patch = pcalloc(sizeof(PCPATCH_DIMENSIONAL));
-				memcpy(o_patch, patch, sizeof(PCPATCH_DIMENSIONAL));
-				o_patch->bytes = pcalloc(patch-> new_dim_number  * sizeof(PCBYTES));
-				o_patch->npoints =  patch->npoints;
-				o_patch->stats = o_patch->stats;
+				
+				
+				
+				//initalyze to 0 the bytes structure 
+				o_patch->bytes = pcalloc( new_dim_number  * sizeof(PCBYTES));
+				pc_bytes_empty(o_patch->bytes);
+				o_patch->npoints =  ((PCPATCH_DIMENSIONAL*)patch)->npoints;
+		
+		/*
+				o_patch->stats = ((PCPATCH_DIMENSIONAL*)patch)->stats;
 			
+			
+				//modifying the schema to keep only necessary dimensions
+					//modifying the schema
+					//free schema
+					pc_schema_free(o_patch);
+					//create new empty schema
+					
+					o_patch->schema->ndims = new_dim_number
+					
+					//copying only necessary dimension
+				//slight change of schema_clone, 	
+					int j;
+					PCDIMENSION *temp_pcdimension = pcalloc(sizeof(PCDIMENSION));
+					
+					o_patch->schema = pc_schema_new(new_dim_number);
+					o_patch->schema->pcid = patch->schema->pcid;
+					o_patch->schema->srid = patch->schema->srid;
+					o_patch->schema->x_position = patch->schema->x_position;
+					o_patch->schema->y_position = patch->schema->y_position;
+					o_patch->schema->compression = patch->schema->compression;
+					
+					
+					for ( j = 0; j < new_dim_number; i++ )//loop on all the dimension we want to keep
+					{//adding the dimension if it is one we have to keep
+						
+						//cloning old dimension into a  new one
+						temp_pcdimension = pc_dimension_clone(pc_schema_get_dimension_by_name(dim_to_keep[j]));
+						//change the position to "j"
+						temp_pcdimension->position=j;
+						
+						//adding this new dimension to new patch
+							pc_schema_set_dimension(o_patch->schema, temp_pcdimension);
+						}
+					}
+					
+					
+					pc_schema_calculate_byteoffsets(pcs);
+					* 
+					* */
+					
+			/*		
+			TO CHANGE : we must fil the bit in the right order because dimension order have been changed.
 			//file the bytes , allocating when necessary :
+			int i = 0;
 			for ( i = 0; i < new_dim_number; i++ )
 				{
-					o_patch->bytes[i] = patch->bytes[i];
+					o_patch->bytes[i] = ((PCPATCH_DIMENSIONAL*)patch)->bytes[i];
 				}
+			*/ 
 			
-			pcerror("%s: error : function not yet completed !", __func__);
+			paout =  (PCPATCH *)o_patch ;
+			break;
+			//pcerror("%s: error : function not yet completed !", __func__);
 			
 	}
 	default:
 		pcerror("%s: failure", __func__);
 	}
 		
+	//returning the result
+	return paout;
 }
 
 

@@ -90,7 +90,7 @@ pc_bytes_encode(PCBYTES pcb, int compression)
 	}
 	default:
 	{
-		pcerror("%s: Uh oh", __func__);
+		pcerror("%s: Uh oh, this compression is not valid !", __func__);
 	}
 	}
 	return epcb;
@@ -124,7 +124,7 @@ pc_bytes_decode(PCBYTES epcb)
 	}
 	default:
 	{
-		pcerror("%s: Uh oh", __func__);
+		pcerror("%s: Uh oh, this compression is not valid", __func__);
 	}
 	}
 	return pcb;
