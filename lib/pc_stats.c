@@ -9,6 +9,7 @@
 
 #include "pc_api_internal.h"
 #include <float.h>
+#include "stringbuffer.h"
 
 /*
 * Instantiate a new PCDOUBLESTATS for calculation, and set up
@@ -144,6 +145,23 @@ pc_stats_clone(const PCSTATS *stats)
 	return s;
 }
 
+/**
+ * @brief this function takes a pcstats and a schema and set the pcstats to use the given schema, then return the pcstats
+ * @param the pcstats of which we want to change the schema
+ * @param the schema the pcstats should use
+ * @return the pcstats using the given schema, no memory is allocated 
+ * 
+ * */
+PCSTATS *
+pc_stats_update_schema(PCSTATS *stats,const PCSCHEMA * pds)
+{
+	
+	stats->min.schema = pds;
+	stats->max.schema = pds;
+	stats->avg.schema = pds;
+	return stats;
+}
+
 int
 pc_patch_uncompressed_compute_stats(PCPATCH_UNCOMPRESSED *pa)
 {
@@ -194,4 +212,25 @@ pc_stats_size(const PCSCHEMA *schema)
 }
 
 
+/** Convert a PCSTATS to a human-readable JSON string */
+char *
+pc_stats_to_json(const PCSTATS *pcs)
+{
+	
+	int i;
+	char *str;
+	stringbuffer_t *sb = stringbuffer_create();
+	stringbuffer_append(sb, "{");
 
+	if ( pcs->min.data )
+		stringbuffer_aprintf(sb, "\"min\" : %s,\n", pc_point_to_string( &(pcs->min) ));
+	if ( pcs->max.data )
+		stringbuffer_aprintf(sb, "\"max\" : %s,\n", pc_point_to_string( &(pcs->max) ));
+	if ( pcs->avg.data )
+		stringbuffer_aprintf(sb, "\"avg\" : %s,\n", pc_point_to_string( &(pcs->avg) ));
+
+	stringbuffer_append(sb, "}\n");
+	str = stringbuffer_getstringcopy(sb);
+	stringbuffer_destroy(sb);
+	return str;
+}

@@ -578,7 +578,8 @@ test_patch_subset()
 	
 	//testing reduce_dimension function
     pa3 = pc_patch_reduce_dimension(pa1, dim_to_keep, new_dim_number);
-    
+    char* test =  pc_stats_to_json(pa3->stats);
+    printf("%s",pc_stats_to_json(pa3->stats));
     
     CU_ASSERT(0 == 1);
     return;

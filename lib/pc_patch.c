@@ -456,7 +456,7 @@ pc_patch_reduce_dimension(PCPATCH *patch, char ** dim_to_keep, uint32_t dimensio
 	//get dimension number from name for "X", "Y", "Z" into an array of int 
 		//create array of int of size 3 
 		// get dimension position from dimension name into int array
-		uint32_t new_dim_number = 2; 
+		//uint32_t new_dim_number = 2; 
 		//char *dim_to_keep[] = { "x", "Z"};
 		uint32_t dim_position[3] = { -1,-1 };
 		
@@ -501,12 +501,14 @@ pc_patch_reduce_dimension(PCPATCH *patch, char ** dim_to_keep, uint32_t dimensio
 					//cloning the patch structure
 					memcpy(o_patch, patch, sizeof(PCPATCH_DIMENSIONAL));
 					//cloning the schema with a subset of dimension
-						o_patch->schema =  pc_schema_clone_subset(patch->schema, dim_position, new_dim_number);
+						o_patch->schema =  pc_schema_clone_subset(patch->schema, dim_position, dimensions_number);
 					
-					printf("\n schema to json : %s \n",pc_schema_to_json(o_patch->schema), new_dim_number);//test  :
+					printf("\n schema to json : %s \n",pc_schema_to_json(o_patch->schema), dimensions_number);//test  :
 					
-					//cloning the dimstats with a subset of dimension
-					
+					//cloning the dimstats with a subset of dimension :
+						//What is the use of dimdstats? only if dimstats as entry
+					//cloning simple stats thenupdating schema to the reduced version
+						o_patch->stats = pc_stats_update_schema(pc_stats_clone(patch->stats), o_patch->schema);
 					//cloning the bytes with a subset of dimension
 				
 				//checking the validity of patch
@@ -516,7 +518,7 @@ pc_patch_reduce_dimension(PCPATCH *patch, char ** dim_to_keep, uint32_t dimensio
 				
 				
 				//initalyze to 0 the bytes structure 
-				o_patch->bytes = pcalloc( new_dim_number  * sizeof(PCBYTES));
+				o_patch->bytes = pcalloc( dimensions_number  * sizeof(PCBYTES));
 				pc_bytes_empty(o_patch->bytes);
 				o_patch->npoints =  ((PCPATCH_DIMENSIONAL*)patch)->npoints;
 		

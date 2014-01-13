@@ -405,6 +405,12 @@ size_t pc_stats_size(const PCSCHEMA *schema);
 /** Calculate stats on an existing patch */
 int pc_patch_compute_stats(PCPATCH *patch);
 
+/** Update the schema of a stats struct, no memrory allocation*/
+PCSTATS * pc_stats_update_schema(PCSTATS *, const PCSCHEMA *);
+
+/** return the PCSTATS as a JSON text*/
+char* pc_stats_to_json(const PCSTATS *pcs);
+
 /** Calculate extent on an existing patch */
 int pc_patch_compute_extent(PCPATCH *patch);
 
