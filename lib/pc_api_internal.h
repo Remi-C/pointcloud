@@ -161,8 +161,7 @@ int pc_point_set_double(PCPOINT *pt, const PCDIMENSION *dim, double val);
 * DIMENSION STATISTICS
 */
 
-/** Analyze the bytes in the #PCPATCH_DIMENSIONAL and update the #PCDIMSTATS */
-int pc_dimstats_update(PCDIMSTATS *pds, const PCPATCH_DIMENSIONAL *pdl);
+
 /** Free the PCDIMSTATS memory */
 void pc_dimstats_free(PCDIMSTATS *pds);
 char* pc_dimstats_to_string(const PCDIMSTATS *pds);
@@ -274,6 +273,8 @@ void pc_bounds_init(PCBOUNDS *b);
 PCSTATS* pc_stats_clone(const PCSTATS *stats);
 /** Expand extents of b1 to encompass b2 */
 void pc_bounds_merge(PCBOUNDS *b1, const PCBOUNDS *b2);
+/** Print bounds to json */
+char * pc_bounds_to_string(PCBOUNDS *b);
 
 /****************************************************************************
 * BITMAPS

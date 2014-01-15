@@ -253,7 +253,8 @@ uint32_t wkb_get_pcid(const uint8_t *wkb);
 PCDIMSTATS* pc_dimstats_make(const PCSCHEMA *schema);
 /** Clone a given dimstats, only keeping the dimension in array of dimension. Dimensions position are changed and are equal to there index in input array*/
 PCDIMSTATS * pc_dimstats_clone_subset(const PCDIMSTATS *, uint32_t *, uint32_t);
-
+/** Analyze the bytes in the #PCPATCH_DIMENSIONAL and update the #PCDIMSTATS */
+int pc_dimstats_update(PCDIMSTATS *pds, const PCPATCH_DIMENSIONAL *pdl);
 /**********************************************************************
 * SCHEMAS
 */

@@ -519,17 +519,20 @@ pc_patch_dimensional_serialize(const PCPATCH *patch_in)
 	int i;
 	uint8_t *buf;
 	size_t serpch_size = pc_patch_serialized_size(patch_in);
+	pcinfo("	dim serialisation : size of serpatch: %zu\n",serpch_size);
+	pcinfo("	dim serialisation : allocating \n");
 	SERIALIZED_PATCH *serpch = pcalloc(serpch_size);
 	const PCPATCH_DIMENSIONAL *patch = (PCPATCH_DIMENSIONAL*)patch_in;
-
+	pcinfo("	dim serialisation : asserting\n");
 	assert(patch_in);
 	assert(patch_in->type == PC_DIMENSIONAL);
-
+	pcinfo("	dim serialisation : just copied \n");
 	/* Copy basics */
 	serpch->pcid = patch->schema->pcid;
 	serpch->npoints = patch->npoints;
 	serpch->bounds = patch->bounds;
 	serpch->compression = patch->type;
+	pcinfo("	dim serialisation : just copied basic : pcid : %d, npoints : %d, compression :%d,  bounds\n", serpch->pcid,serpch->npoints,serpch->compression );
 
 	/* Get a pointer to the data area */
 	buf = serpch->data;
@@ -537,6 +540,8 @@ pc_patch_dimensional_serialize(const PCPATCH *patch_in)
 	/* Write stats into the buffer */
 	if ( patch->stats )
 	{
+			pcinfo("	dim serialisation : serializubng stats : %s\n",pc_stats_to_json(patch->stats) );
+
 		buf += pc_patch_stats_serialize(buf, patch->schema, patch->stats);
 	}
 	else
@@ -547,12 +552,13 @@ pc_patch_dimensional_serialize(const PCPATCH *patch_in)
 	/* Write each dimension in after the stats */
 	for ( i = 0; i < patch->schema->ndims; i++ )
 	{
+			pcinfo("	dim serialisation : writing dim %d\n",i);
 		size_t bsize = 0;
 		PCBYTES *pcb = &(patch->bytes[i]);
 		pc_bytes_serialize(pcb, buf, &bsize);
 		buf += bsize;
 	}
-
+	pcinfo("	dim serialisation : setting varsize of serpch to %zu: \n",serpch_size  );
 	SET_VARSIZE(serpch, serpch_size);
 	return serpch;
 }
@@ -659,6 +665,7 @@ pc_patch_serialize(const PCPATCH *patch_in, void *userdata)
 {
 	PCPATCH *patch = (PCPATCH*)patch_in;
 	SERIALIZED_PATCH *serpatch = NULL;
+	pcinfo("serializing in pc_patch_serialize \n");
 	/*
 	* Ensure the patch has stats calculated before going on
 	*/
@@ -685,6 +692,7 @@ pc_patch_serialize(const PCPATCH *patch_in, void *userdata)
 	}
 	case PC_DIMENSIONAL:
 	{
+			pcinfo("	dimensionnal patch type\n");
 		serpatch = pc_patch_dimensional_serialize(patch);
 		break;
 	}
@@ -994,4 +1002,66 @@ pc_patch_to_geometry_wkb_envelope(const SERIALIZED_PATCH *pa, const PCSCHEMA *sc
 
 	if ( wkbsize ) *wkbsize = size;
 	return wkb;
+}
+/**
+ * @brief This function returns as string the paramter of a struct SERIALIZED_PATCH, (it doesn't read the "data")
+ * @param a pointer to a SERIALIZED_PATCH we want to print 
+ * @param the schema of this SERIALIZED_PATCH
+ * @return a json type string
+ * */
+char* 
+pc_serpatch_to_string(const SERIALIZED_PATCH *sp, const PCSCHEMA *schema)
+{
+	/*
+	typedef struct
+{
+	uint32_t size;
+	uint32_t pcid;
+	uint32_t compression;
+	uint32_t npoints;
+	PCBOUNDS bounds;
+	uint8_t data[1];
+}
+SERIALIZED_PATCH;
+*/
+
+/* { "pcid":1, "points":[[<dim1>, <dim2>, <dim3>, <dim4>],[<dim1>, <dim2>, <dim3>, <dim4>]] }*/
+	stringbuffer_t *sb = stringbuffer_create();
+	char * str;
+
+	stringbuffer_aprintf(sb, 
+		"{\"size\":%d,\"pcid\":%d,\"compression\":%d,\"npoints\":%d,\"bounds\":%d,[", 
+		sp->size,
+		);
+	for ( i = 0; i < pl->npoints; i++ )
+	{
+		PCPOINT *pt = pc_pointlist_get_point(pl, i);
+		if ( i )
+		{
+			stringbuffer_append(sb, ",");
+		}
+		stringbuffer_append(sb, "[");
+		for ( j = 0; j < pt->schema->ndims; j++ )
+		{
+			double d;
+			if ( ! pc_point_get_double_by_index(pt, j, &d))
+			{
+				pcerror("%s: unable to read double at index %d", __func__, j);
+			}
+			if ( j )
+			{
+				stringbuffer_append(sb, ",");
+			}
+			stringbuffer_aprintf(sb, "%g", d);
+		}
+		stringbuffer_append(sb, "]");
+	}
+	stringbuffer_append(sb, "]}");
+
+	/* All done, copy and clean up */
+	pc_pointlist_free(pl);
+	str = stringbuffer_getstringcopy(sb);
+	stringbuffer_destroy(sb);
+
+	return str;
 }

@@ -536,8 +536,9 @@ Datum pcpatch_subset(PG_FUNCTION_ARGS)
 		SERIALIZED_PATCH *serpa;
 		PCSCHEMA *schema ;
 		PCPATCH *patch; 
-		uint32_t new_dim_number = 3; 
-		char * dim_to_keep[3] = { "x", "y","Z"}; 
+		uint32_t new_dim_number = 2; 
+		char * dim_to_keep[2] = { "x", "y" }; 
+		PCDIMSTATS * pds;
 			//doing nothing :
 			//PG_RETURN_POINTER(PG_GETARG_SERPATCH_P(0));
 		
@@ -554,18 +555,29 @@ Datum pcpatch_subset(PG_FUNCTION_ARGS)
 		pcinfo("patch we want to reduce : %s",pc_patch_to_string(patch));
 		//pcerror("patch we want to reduce : %s",pc_patch_to_string(patch));
 		patch_output = pc_patch_reduce_dimension(patch,dim_to_keep,new_dim_number);
+		schema = patch_output->schema;
 		
-		
+		//computig dimstats
+		//pds = pc_dimstats_make(patch_output->schema);
+		//pc_dimstats_update(pds,(PCPATCH_DIMENSIONAL *) patch_output );
+
 		//serialization
 		pcinfo("serializing");
 		serpa_out = pc_patch_serialize(patch_output, NULL);
 		pcinfo("size of the returned data : %zu",pc_patch_serialized_size( patch_output));
-		pcinfo("freeing");
 		
+			//re- deserialization
+			pcinfo("2nd deserialization\n");
+			patch_output = pc_patch_deserialize( serpa_out,schema);
+			//re-serialization
+			pcinfo("2nd  serialization\n");
+			serpa_out = pc_patch_serialize(patch_output, NULL);
+			
+		pcinfo("freeing");
 		pc_patch_free(patch);
 		pc_patch_free(patch_output);
-		pcinfo("returning pointer");
 		
+		pcinfo("returning pointer");
 		PG_RETURN_POINTER(serpa_out);
 		
 		/*

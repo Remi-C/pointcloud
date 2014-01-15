@@ -10,6 +10,7 @@
 ***********************************************************************/
 
 #include "pc_api_internal.h"
+#include "stringbuffer.h"
 #include <float.h>
 
 /**********************************************************************************
@@ -316,3 +317,30 @@ void pc_bounds_merge(PCBOUNDS *b1, const PCBOUNDS *b2)
 	if ( b2->ymax > b1->ymax ) b1->ymax = b2->ymax;
 }
 
+/**
+ * @brief this function retura a PCBOUNDS as a string json type
+ * @param the bounds to print
+ * @return a JSON type char* 
+ * */
+
+char * pc_bounds_to_string(PCBOUNDS *b)
+{
+	/*{
+	double xmin;
+	double xmax;
+	double ymin;
+	double ymax;
+	} PCBOUNDS;
+	 * */
+	stringbuffer_t *sb = stringbuffer_create();
+	char *str;
+
+	stringbuffer_aprintf(sb, 
+		"{\"xmin\":%lf,\"xmax\":%lf,\"ymin\":%lf,\"ymax\":%lf }", 
+		b->xmin,b->xmax,b->ymin,b->ymax);
+
+	/* All done, copy and clean up */ 
+	str = stringbuffer_getstringcopy(sb);
+	stringbuffer_destroy(sb);
+	return str;
+}

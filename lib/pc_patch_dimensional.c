@@ -229,7 +229,6 @@ pc_patch_dimensional_compute_extent(PCPATCH_DIMENSIONAL *pdl)
 	ymax = pc_value_scale_offset(xmax, pdl->schema->dims[pdl->schema->y_position]);
 	pdl->bounds.ymin = ymin;
 	pdl->bounds.ymax = ymax;
-
 	return PC_SUCCESS;
 }
 

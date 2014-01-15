@@ -551,6 +551,7 @@ test_patch_subset()
     // PCPATCH* pc_patch_filter(const PCPATCH *pa, uint32_t dimnum, PC_FILTERTYPE filter, double val1, double val2);
 
     pa1 = (PCPATCH*)pc_patch_dimensional_from_pointlist(pl1);
+
      
     printf("pa1\n%s\n", pc_patch_to_string(pa1));
     
@@ -561,7 +562,7 @@ test_patch_subset()
     printf("\n\n	position of x : %i \n\n",pc_schema_get_dimension_position_by_name(pa1->schema, "x"));
     uint32_t new_dim_number = 2; 
 	char *dim_to_keep[] = { "x", "Z"}; 
-	uint32_t dim_position[3];
+	uint32_t dim_position[2];
 	int i2 ;
 		for(i2=0;i2<new_dim_number;i2++)
 		{
@@ -569,7 +570,8 @@ test_patch_subset()
 			printf("\n dimension %s has position %d",dim_to_keep[i2],dim_position[i2] );
 		}
 	printf("\n");
-	
+	 //test of pc_bounds_to_string(PCBOUNDS *b) 
+    
     //testing dimstat function :
 		//creating dimstats
 		//pds = pc_dimstats_make(simpleschema);
@@ -585,6 +587,9 @@ test_patch_subset()
     printf("\n the stats to json : %s",pc_stats_to_json(pa3->stats));
     printf("\n \n \n the patch to json : %s" , pc_patch_to_string(pa3));
     
+    
+    //test of pc_bounds_to_string(PCBOUNDS *b)
+    printf("the bounds of pa3 : %s \n",  pc_bounds_to_string( &(pa3->bounds) ) );
     //test of the serialize / deserialize function to emulate the pc_acess top function
 	
    // CU_ASSERT(0 == 1);
