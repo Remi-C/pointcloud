@@ -10,6 +10,7 @@
 #include "CUnit/Basic.h"
 #include "cu_tester.h"
 
+
 /* GLOBALS ************************************************************/
 
 static PCSCHEMA *schema = NULL;
@@ -571,17 +572,22 @@ test_patch_subset()
 	
     //testing dimstat function :
 		//creating dimstats
-		pds = pc_dimstats_make(simpleschema);
-		pc_dimstats_update(pds, (PCPATCH_DIMENSIONAL*)pa1);
+		//pds = pc_dimstats_make(simpleschema);
+		//pc_dimstats_update(pds, (PCPATCH_DIMENSIONAL*)pa1);
 		//testing function : 
 		//PCDIMSTATS * o_dimstats = pc_dimstats_clone_subset(pds,dim_position, new_dim_number);
 	
 	//testing reduce_dimension function
+    printf("\n \n beginning test of patch_reduce_dimension \n ");
     pa3 = pc_patch_reduce_dimension(pa1, dim_to_keep, new_dim_number);
-    char* test =  pc_stats_to_json(pa3->stats);
-    printf("%s",pc_stats_to_json(pa3->stats));
     
-    CU_ASSERT(0 == 1);
+    printf("\n the schema to json : %s",pc_schema_to_json(pa3->schema));
+    printf("\n the stats to json : %s",pc_stats_to_json(pa3->stats));
+    printf("\n \n \n the patch to json : %s" , pc_patch_to_string(pa3));
+    
+    //test of the serialize / deserialize function to emulate the pc_acess top function
+	
+   // CU_ASSERT(0 == 1);
     return;
 		//test on schema :
 		

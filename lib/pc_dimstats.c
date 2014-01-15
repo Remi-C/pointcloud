@@ -179,7 +179,7 @@ pc_dimstats_clone_subset(const PCDIMSTATS * d, uint32_t * dimensions_position_ar
 		{
 				printf("\n dimension position array : %d \n",dimensions_position_array[i]);
 				
-			//	pds->stats[i] = pc_dimstat_clone( d->stats[dimensions_position_array[i]] ); 
+				((*pds).stats[i]) = *pc_dimstat_clone( &(d->stats[dimensions_position_array[i]]) ); 
 				
 			printf("cloning the stat %d in new position %d",dimensions_position_array[i],i);
 		}

@@ -430,5 +430,7 @@ PCPATCH* pc_patch_filter_equal_by_name(const PCPATCH *pa, const char *name, doub
 PCPATCH* pc_patch_filter_between_by_name(const PCPATCH *pa, const char *name, double val1, double val2);
 
 /** Subset of a patch by reducing the number of dimension, the name of dimension to keep are in array, the total number of dimension to keep is also to provide*/
-PCPATCH* pc_patch_reduce_dimension(PCPATCH *, char **, uint32_t);
+PCPATCH* pc_patch_reduce_dimension(PCPATCH *pa, char **array, uint32_t num);
+
+
 #endif /* _PC_API_H */

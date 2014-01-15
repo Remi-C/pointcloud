@@ -39,6 +39,37 @@ pc_patch_dimensional_clone(const PCPATCH_DIMENSIONAL *patch)
 	return pdl;
 }
 
+/**
+ * @brief This function takes an array of PCBYTES and return an array of PCBYTES containing only the dimension in the array given as a parameter
+ * @param an array on PCBYTES with too much dimension
+ * @param an array describing the name of the dimension we want to keep
+ * @param the number of dimension we want to keep
+ * @return A PCBYTES array of size given by the dimension number parameter
+ * */
+PCBYTES * 
+pc_patch_dimensional_clone_subset_of_bytes(PCBYTES * bytes, uint32_t * dimensions_position_array, uint32_t dimensions_number)
+{
+	int i ;	 
+	//PCPATCH_DIMENSIONAL *pdl = pcalloc(sizeof(PCPATCH_DIMENSIONAL));
+	//memcpy(pdl, patch, sizeof(PCPATCH_DIMENSIONAL));
+	PCBYTES * o_bytes = pcalloc(dimensions_number * sizeof(PCBYTES));
+	
+	//loop on dimension to keep, for each dimension to keep, copy byte content into output
+	
+	for ( i = 0; i < dimensions_number; i++ )
+	{
+		if ( sizeof(bytes[dimensions_position_array[i]]) != 0L)
+		{
+				
+				o_bytes[i] = pc_bytes_clone( bytes[dimensions_position_array[i]] ) ; 
+				
+			printf("cloning the bytes of dimension %d in new position %d\n",dimensions_position_array[i],i);
+		}
+	}
+	
+	return o_bytes;
+}
+
 size_t
 pc_patch_dimensional_serialized_size(const PCPATCH_DIMENSIONAL *patch)
 {

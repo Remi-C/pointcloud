@@ -232,12 +232,12 @@ pc_schema_clone_subset(const PCSCHEMA *s, uint32_t * dimensions_position_array, 
 				temp_dim->position=i ; //changing the position so to have continuous dimension position
 				
 			pc_schema_set_dimension(pcs,temp_dim);
-			printf("cloning the dimension %s in new position %d",temp_dim->name,i);
+			//printf("cloning the dimension %s in new position %d",temp_dim->name,i);
 		}
 	}
-	printf("\n end of for loop \n");
+	
 	pc_schema_calculate_byteoffsets(pcs);
-	printf("finishing byteoffset calculation \n");
+
 	return pcs;
 }
 

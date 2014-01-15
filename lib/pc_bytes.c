@@ -49,7 +49,7 @@ pc_bytes_make(const PCDIMENSION *dim, uint32_t npoints)
 	return pcb;
 }
 
-static PCBYTES
+PCBYTES
 pc_bytes_clone(PCBYTES pcb)
 {
 	PCBYTES pcbnew = pcb;

@@ -531,22 +531,60 @@ Datum pcpatch_uncompress(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(pcpatch_subset);
 Datum pcpatch_subset(PG_FUNCTION_ARGS)
 {
-		//do like uncompress, for test purpose
-	
+		PCPATCH *patch_output;
+		SERIALIZED_PATCH *serpa_out;
+		SERIALIZED_PATCH *serpa;
+		PCSCHEMA *schema ;
+		PCPATCH *patch; 
+		uint32_t new_dim_number = 3; 
+		char * dim_to_keep[3] = { "x", "y","Z"}; 
+			//doing nothing :
+			//PG_RETURN_POINTER(PG_GETARG_SERPATCH_P(0));
+		
+		serpa = PG_GETARG_SERPATCH_P(0);
+		schema = pc_schema_from_pcid(serpa->pcid, fcinfo);
+		patch = pc_patch_deserialize( serpa,schema);
+		
+		//end of deserialization
+		
+		//emulating a text[] entry
+		
+		
+		
+		pcinfo("patch we want to reduce : %s",pc_patch_to_string(patch));
+		//pcerror("patch we want to reduce : %s",pc_patch_to_string(patch));
+		patch_output = pc_patch_reduce_dimension(patch,dim_to_keep,new_dim_number);
+		
+		
+		//serialization
+		pcinfo("serializing");
+		serpa_out = pc_patch_serialize(patch_output, NULL);
+		pcinfo("size of the returned data : %zu",pc_patch_serialized_size( patch_output));
+		pcinfo("freeing");
+		
+		pc_patch_free(patch);
+		pc_patch_free(patch_output);
+		pcinfo("returning pointer");
+		
+		PG_RETURN_POINTER(serpa_out);
+		
+		/*
 		SERIALIZED_PATCH *serpa = PG_GETARG_SERPATCH_P(0);
 		PCSCHEMA *schema = pc_schema_from_pcid(serpa->pcid, fcinfo);
 		PCPATCH *patch = pc_patch_deserialize(serpa, schema);
 
-	//keeping only asked dimension 
-		PCPATCH *patch_output = pc_patch_reduce_dimension(patch);
-		//@WARNING @TODO : the patch should be compressed.
-		SERIALIZED_PATCH *serpa_out = pc_patch_serialize(patch_output, NULL);
 		
+	
+	//keeping only asked dimension  
+		//PCPATCH *patch_output = pc_patch_reduce_dimension(patch,dim_to_keep,new_dim_number);
+		//@WARNING @TODO : the patch should be compressed.
+		//SERIALIZED_PATCH *serpa_out = pc_patch_serialize(patch_output, NULL);
+		SERIALIZED_PATCH *serpa_out = pc_patch_serialize(patch, NULL);
 		
 		pc_patch_free(patch);
 		pc_patch_free(patch_output);
 		PG_RETURN_POINTER(serpa_out);
-	
+	*/
 }
 
 PG_FUNCTION_INFO_V1(pcpatch_numpoints);

@@ -188,6 +188,8 @@ PCPATCH* pc_patch_dimensional_from_wkb(const PCSCHEMA *schema, const uint8_t *wk
 PCPATCH_DIMENSIONAL* pc_patch_dimensional_from_pointlist(const PCPOINTLIST *pdl);
 PCPOINTLIST* pc_pointlist_from_dimensional(const PCPATCH_DIMENSIONAL *pdl);
 PCPATCH_DIMENSIONAL* pc_patch_dimensional_clone(const PCPATCH_DIMENSIONAL *patch);
+/**cloning the bytes content of a PCBYTES array but only for a subset of dimension */
+PCBYTES* pc_patch_dimensional_clone_subset_of_bytes(PCBYTES *, uint32_t *,uint32_t);
 
 /* UNCOMPRESSED PATCHES */
 char* pc_patch_uncompressed_to_string(const PCPATCH_UNCOMPRESSED *patch);
@@ -259,6 +261,8 @@ PCBYTES pc_bytes_filter(const PCBYTES *pcb, const PCBITMAP *map, PCDOUBLESTAT *s
 PCBITMAP* pc_bytes_bitmap(const PCBYTES *pcb, PC_FILTERTYPE filter, double val1, double val2);
 int pc_bytes_minmax(const PCBYTES *pcb, double *min, double *max, double *avg);
 
+/** this function clone a PCBYTES for patch_dimensionnal*/
+PCBYTES pc_bytes_clone(PCBYTES bytes);
 
 /****************************************************************************
 * BOUNDS
