@@ -445,7 +445,7 @@ Datum pcpatch_agg_final_pcpatch(PG_FUNCTION_ARGS)
 }
 
 
-PG_FUNCTION_INFO_V1(pcpatch_unnest);
+PGl_FUNCTION_INFO_V1(pcpatch_unnest);
 Datum pcpatch_unnest(PG_FUNCTION_ARGS)
 {
 	typedef struct
@@ -539,13 +539,69 @@ Datum pcpatch_subset(PG_FUNCTION_ARGS)
 		uint32_t new_dim_number = 3; 
 		char * dim_to_keep[4] = {"x","y","Z","intensity"}; 
 		PCDIMSTATS * pds;
-			//doing nothing :
-			//PG_RETURN_POINTER(PG_GETARG_SERPATCH_P(0));
+		
+		
 		
 		serpa = PG_GETARG_SERPATCH_P(0);
 		schema = pc_schema_from_pcid(serpa->pcid, fcinfo);
 		patch = pc_patch_deserialize( serpa,schema);
 		
+		
+		//taking care of the second argument which is a TEXT[] containing the dimension to keep
+				
+				ArrayType *arrptr = PG_GETARG_ARRAYTYPE_P(1);
+				int nelems;
+				int i3;
+				text ** vals;
+				char ** cstring_array;
+				
+				//this get segfault
+				nelems = ARR_DIMS(arrptr)[0];
+				vals = (text**) ARR_DATA_PTR(arrptr);
+				cstring_array = (char **) pcalloc(nelems * sizeof(char * ) );
+				for (i3=0;i3<nelems;i3++)
+				{ 
+					cstring_array[i3] = text_to_cstring( vals[i3]);
+					
+					elog(INFO, "elem %d of dim_array : %s\n",i3,cstring_array[i3]);
+				}
+			 //text *dim_name = PG_GETARG_TEXT_P(1);
+			 
+ 
+			/*
+				//if ( ARR_ELEMTYPE(arrptr) !=  text*  )
+				//	elog(ERROR, "array must be of text[]");
+
+				if ( ARR_NDIM(arrptr) != 1 )
+					elog(ERROR, "text[] must have only one dimension");
+
+				if ( ARR_HASNULL(arrptr) )
+					elog(ERROR, "text[] must not have null elements");
+
+				nelems = ARR_DIMS(arrptr)[0];
+				
+				if ( nelems >= schema->ndims || ARR_LBOUND(arrptr)[0] > 1 )
+					elog(ERROR, "too many dimensions for this schema of pcid = %d", schema->pcid);
+
+				
+				vals = (text**) ARR_DATA_PTR(arrptr);
+				pcinfo("nelements in array : %d \n  \n ",nelems );
+				//alocating a char* array of the right size
+				dim_array = (char *) pcalloc(nelems * sizeof(char * ) );
+				//filling the char * array with char* obtained from text
+				for (i3=0;i3<nelems;i3++)
+				{ 
+					
+					//dim_array[i3] = 
+					text_to_cstring( vals[i3]);
+					
+					pcinfo("another text stored\n");
+					//pcinfo("elem %d of dim_array : %s\n",i3,dim_array[i3]);
+				}
+				*/
+				
+				//pcinfo("content of text  : %s \n ", text_to_cstring(dim_name) );
+				
  
 		
 		

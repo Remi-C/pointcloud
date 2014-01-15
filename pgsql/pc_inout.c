@@ -107,7 +107,7 @@ Datum pcpoint_out(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(pcpatch_in);
 Datum pcpatch_in(PG_FUNCTION_ARGS)
 {
-	pcinfo("\n  pcpatch in \n");
+
 	char *str = PG_GETARG_CSTRING(0);
 	/* Datum geog_oid = PG_GETARG_OID(1); Not needed. */
 	uint32 typmod = 0, pcid = 0;

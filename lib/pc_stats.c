@@ -216,9 +216,7 @@ pc_stats_size(const PCSCHEMA *schema)
 char *
 pc_stats_to_json(const PCSTATS *pcs)
 {
-	
-	int i;
-	char *str;
+	 char *str;
 	stringbuffer_t *sb = stringbuffer_create();
 	stringbuffer_append(sb, "{");
 
