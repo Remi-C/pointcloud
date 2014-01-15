@@ -12,7 +12,9 @@
 
 #include <math.h>
 #include <assert.h>
+
 #include "pc_api_internal.h"
+#include "stringbuffer.h"
 
 /*
 typedef struct
@@ -326,5 +328,40 @@ pc_patch_dimensional_from_pointlist(const PCPOINTLIST *pdl)
 	PCPATCH_DIMENSIONAL *dimpatch = pc_patch_dimensional_from_uncompressed(patch);
 	pc_patch_uncompressed_free(patch);
 	return dimpatch;
+}
+
+char * pc_patch_dimensional_bytes_array_to_string(PCPATCH_DIMENSIONAL* pd)
+{
+	int i;
+	char *str;
+	stringbuffer_t *sb = stringbuffer_create();
+	
+	
+	stringbuffer_append(sb, "{");
+
+	if ( pd->schema->ndims )
+	{
+
+		stringbuffer_append(sb, "\"bytes\" : [\n");
+
+		for ( i = 0; i < pd->schema->ndims; i++ )
+		{
+			if ( pd->bytes[i].bytes )
+			{
+				PCBYTES *d = &pd->bytes[i];
+
+				if ( i ) stringbuffer_append(sb, ",");
+				stringbuffer_append(sb, "\n { \n");
+
+				stringbuffer_aprintf(sb, " %s ",  pc_bytes_to_string(d));
+				stringbuffer_append(sb, " }");
+			}
+		}
+		stringbuffer_append(sb, "\n]\n");
+	}
+	stringbuffer_append(sb, "}\n");
+	str = stringbuffer_getstringcopy(sb);
+	stringbuffer_destroy(sb);
+	return str;
 }
 

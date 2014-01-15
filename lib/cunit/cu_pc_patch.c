@@ -561,16 +561,24 @@ test_patch_subset()
     printf("testing the dimension-reduction function\n");
     printf("\n\n	position of x : %i \n\n",pc_schema_get_dimension_position_by_name(pa1->schema, "x"));
     uint32_t new_dim_number = 2; 
-	char *dim_to_keep[] = { "x", "Z"}; 
+	char *dim_to_keep[] = { "x", "y", "Z"}; 
 	uint32_t dim_position[2];
 	int i2 ;
+	
+	//test of pc_schema_get_dimension_position_by_name
+	/*
 		for(i2=0;i2<new_dim_number;i2++)
 		{
 			dim_position[i2] = pc_schema_get_dimension_position_by_name(pa1->schema, dim_to_keep[i2]);
 			printf("\n dimension %s has position %d",dim_to_keep[i2],dim_position[i2] );
 		}
 	printf("\n");
+	* */
+	 printf("\n the original schema to json : %s",pc_schema_to_json(pa1->schema));
 	 //test of pc_bounds_to_string(PCBOUNDS *b) 
+	 
+	 //testing the function pc_patch_dimensional_bytes_array_to_string
+	 printf(" the original PCBYTES array :%s",pc_patch_dimensional_bytes_array_to_string((PCPATCH_DIMENSIONAL*)pa1));
     
     //testing dimstat function :
 		//creating dimstats
@@ -587,10 +595,15 @@ test_patch_subset()
     printf("\n the stats to json : %s",pc_stats_to_json(pa3->stats));
     printf("\n \n \n the patch to json : %s" , pc_patch_to_string(pa3));
     
-    
-    //test of pc_bounds_to_string(PCBOUNDS *b)
-    printf("the bounds of pa3 : %s \n",  pc_bounds_to_string( &(pa3->bounds) ) );
+	printf(" the  pa3 PCBYTES array :%s",pc_patch_dimensional_bytes_array_to_string((PCPATCH_DIMENSIONAL*)pa3)); 
+   
     //test of the serialize / deserialize function to emulate the pc_acess top function
+    
+    //test on the result pathc :
+		 //test of pc_bounds_to_string(PCBOUNDS *b)
+			printf("the bounds of pa3 : %s \n",  pc_bounds_to_string( &(pa3->bounds) ) );
+		//casting patch to pointlist
+			PCPOINTLIST * pl = pc_pointlist_from_patch(pa3);
 	
    // CU_ASSERT(0 == 1);
     return;

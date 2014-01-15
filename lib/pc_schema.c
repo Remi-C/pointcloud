@@ -211,16 +211,15 @@ pc_schema_clone(const PCSCHEMA *s)
  * @return a cloned schema with only the dimension whose position are provided, the new position of dimension is there index+1 in provided array, NULL if something wen wrong
  * */
 PCSCHEMA * 
-pc_schema_clone_subset(const PCSCHEMA *s, uint32_t * dimensions_position_array, uint32_t dimensions_number)
+pc_schema_clone_subset(  PCSCHEMA *s, uint32_t * dimensions_position_array, uint32_t dimensions_number)
 {
 	
 	int i;
 	PCDIMENSION* temp_dim;
 	PCSCHEMA *pcs = pc_schema_new(dimensions_number);
-	pcs->pcid = s->pcid;
+	pcs->pcid = 10;//s->pcid;
 	pcs->srid = s->srid;
-	pcs->x_position = s->x_position;
-	pcs->y_position = s->y_position;
+	
 	pcs->compression = s->compression;
 	
 	printf("\n for loop \n");
@@ -236,6 +235,14 @@ pc_schema_clone_subset(const PCSCHEMA *s, uint32_t * dimensions_position_array, 
 		}
 	}
 	
+	//the new x_position and y_position should be found according to where X and Y dimension are
+		//looking for X and Y in dimension, to get the dimension position
+	pcs->x_position=pc_schema_get_dimension_position_by_name(pcs,"x");
+	pcs->y_position=pc_schema_get_dimension_position_by_name(pcs,"y");
+	//pcs->x_position = s->x_position; 
+	//pcs->y_position = s->y_position;
+	
+	pcinfo("updating schema : x_position : %d, y_position : %d",pcs->x_position,pcs->y_position);
 	pc_schema_calculate_byteoffsets(pcs);
 
 	return pcs;
@@ -275,12 +282,20 @@ pc_schema_to_json(const PCSCHEMA *pcs)
 
 	if ( pcs->pcid )
 		stringbuffer_aprintf(sb, "\"pcid\" : %d,\n", pcs->pcid);
+	if ( pcs->ndims )
+		stringbuffer_aprintf(sb, "\"ndims\" : %d,\n", pcs->ndims);
 	if ( pcs->srid )
 		stringbuffer_aprintf(sb, "\"srid\" : %d,\n", pcs->srid);
 	if ( pcs->compression )
 		stringbuffer_aprintf(sb, "\"compression\" : %d,\n", pcs->compression);
-
-
+	if ( pcs->size )
+		stringbuffer_aprintf(sb, "\"size\" : %zu,\n", pcs->size);
+	if ( pcs->x_position>=0 )
+		stringbuffer_aprintf(sb, "\"x_position\" : %d,\n", pcs->x_position);
+	if ( pcs->y_position >=0)
+		stringbuffer_aprintf(sb, "\"y_position\" : %d,\n", pcs->y_position);
+	if ( pcs->namehash->entrycount )
+		stringbuffer_aprintf(sb, "\"namehash->entrycount\" : %d,\n", pcs->namehash->entrycount);
 	if ( pcs->ndims )
 	{
 

@@ -282,7 +282,7 @@ size_t pc_schema_get_size(const PCSCHEMA *s);
 /** Get the position of a dimension based on its name, -1 if no dimension named like asked*/
 uint32_t pc_schema_get_dimension_position_by_name(const PCSCHEMA *, const char *);
 /** create a clone of the schema with only a part of dimension*/
-PCSCHEMA * pc_schema_clone_subset(const PCSCHEMA *, uint32_t *, uint32_t );
+PCSCHEMA * pc_schema_clone_subset( PCSCHEMA *, uint32_t *, uint32_t );
 
 /**********************************************************************
 * PCPOINTLIST
@@ -361,6 +361,9 @@ PCPATCH* pc_patch_from_pointlist(const PCPOINTLIST *ptl);
 /** Returns a list of points extracted from patch */
 PCPOINTLIST* pc_pointlist_from_patch(const PCPATCH *patch);
 
+/** This function takes a  dimensionnal patch and return the element of the struct(s) PCBYTES as text, whatever the number of PCBYTES in bytes array */
+char * pc_patch_dimensional_bytes_array_to_string(PCPATCH_DIMENSIONAL* pd);
+
 /** Merge a set of patches into a single patch */
 PCPATCH* pc_patch_from_patchlist(PCPATCH **palist, int numpatches);
 
@@ -387,6 +390,9 @@ size_t pc_patch_dimensional_serialized_size(const PCPATCH_DIMENSIONAL *patch);
 
 /** How big will the serialization be? */
 size_t pc_bytes_serialized_size(const PCBYTES *pcb);
+
+/**  A simple function to see what is inside a PCBYTES struct*/
+char * pc_bytes_to_string(PCBYTES * a_bytes_dim);
 
 /** Write the representation down to a buffer */
 int pc_bytes_serialize(const PCBYTES *pcb, uint8_t *buf, size_t *size);
@@ -417,6 +423,9 @@ int pc_patch_compute_extent(PCPATCH *patch);
 
 /** True/false if bounds intersect */
 int pc_bounds_intersects(const PCBOUNDS *b1, const PCBOUNDS *b2);
+
+/** Print bounds to json */
+char * pc_bounds_to_string(PCBOUNDS *b);
 
 /** Subset batch based on less-than condition on dimension */
 PCPATCH* pc_patch_filter_lt_by_name(const PCPATCH *pa, const char *name, double val);

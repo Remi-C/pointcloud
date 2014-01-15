@@ -177,6 +177,10 @@ PCPATCH* pc_patch_filter(const PCPATCH *pa, uint32_t dimnum, PC_FILTERTYPE filte
 
 /* DIMENSIONAL PATCHES */
 char* pc_patch_dimensional_to_string(const PCPATCH_DIMENSIONAL *pa);
+
+/** This function takes a  dimensionnal patch and return the element of the struct(s) PCBYTES as text, whatever the number of PCBYTES in bytes array */
+char * pc_patch_dimensional_bytes_array_to_string(PCPATCH_DIMENSIONAL* pd);
+
 PCPATCH_DIMENSIONAL* pc_patch_dimensional_from_uncompressed(const PCPATCH_UNCOMPRESSED *pa);
 PCPATCH_DIMENSIONAL* pc_patch_dimensional_compress(const PCPATCH_DIMENSIONAL *pdl, PCDIMSTATS *pds);
 PCPATCH_DIMENSIONAL* pc_patch_dimensional_decompress(const PCPATCH_DIMENSIONAL *pdl);
@@ -273,8 +277,7 @@ void pc_bounds_init(PCBOUNDS *b);
 PCSTATS* pc_stats_clone(const PCSTATS *stats);
 /** Expand extents of b1 to encompass b2 */
 void pc_bounds_merge(PCBOUNDS *b1, const PCBOUNDS *b2);
-/** Print bounds to json */
-char * pc_bounds_to_string(PCBOUNDS *b);
+
 
 /****************************************************************************
 * BITMAPS

@@ -23,6 +23,7 @@
 #include <float.h>
 #include "pc_api_internal.h"
 #include "zlib.h"
+#include "stringbuffer.h"
 
 void
 pc_bytes_free(PCBYTES pcb)
@@ -1520,3 +1521,41 @@ pc_bytes_bitmap(const PCBYTES *pcb, PC_FILTERTYPE filter, double val1, double va
 	return NULL;
 }
 
+/**
+ * @brief : this function return a string version of on PCBYTES stuct given in input
+ * @param PCBYTES struct to print
+ * @return return a string representing the PCBYTES struct input
+ * */
+char * 
+pc_bytes_to_string(PCBYTES * a_bytes_dim)
+{
+		/*
+		 * 		size_t size;
+				uint32_t npoints;
+				uint32_t interpretation;
+				uint32_t compression;
+				uint32_t readonly;
+				uint8_t *bytes;
+			} PCBYTES;
+		 * */
+		 
+	char *str;
+	stringbuffer_t *sb = stringbuffer_create();
+	stringbuffer_append(sb, "{");
+
+	if ( a_bytes_dim->size >= 0 )
+		stringbuffer_aprintf(sb, "\"size\" : %zu,\n", a_bytes_dim->size );
+	if ( a_bytes_dim->npoints>=0 )
+		stringbuffer_aprintf(sb, "\"npoints\" : %d,\n",  a_bytes_dim->npoints );
+	if ( a_bytes_dim->interpretation>=0 )
+		stringbuffer_aprintf(sb, "\"interpretation\" : %d,\n",  a_bytes_dim->interpretation );
+	if ( a_bytes_dim->compression >= 0 )
+		stringbuffer_aprintf(sb, "\"compression\" : %d,\n",  a_bytes_dim->compression );
+	if ( a_bytes_dim->readonly >= 0 )
+		stringbuffer_aprintf(sb, "\"readonly\" : %d,\n",  a_bytes_dim->readonly );
+
+	stringbuffer_append(sb, "}\n");
+	str = stringbuffer_getstringcopy(sb);
+	stringbuffer_destroy(sb);
+	return str;
+}

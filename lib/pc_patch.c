@@ -506,7 +506,7 @@ pc_patch_reduce_dimension(PCPATCH *patch, char ** dim_to_keep, uint32_t dimensio
 						o_patch->schema =  pc_schema_clone_subset(patch->schema, dim_position, dimensions_number);
 					//cloning the dimstats with a subset of dimension :
 						//What is the use of dimdstats? only if dimstats is an entry, else we need to compute it anyway, and regular function do it.
-					//cloning simple stats thenupdating schema to the reduced version
+					//cloning simple stats then updating schema to the reduced version
 						printf("\ncloning stats\n");
 						o_patch->stats = pc_stats_update_schema(pc_stats_clone(patch->stats), o_patch->schema);
 					//cloning the bytes with a subset of dimension
@@ -515,12 +515,14 @@ pc_patch_reduce_dimension(PCPATCH *patch, char ** dim_to_keep, uint32_t dimensio
 				pcinfo("all substructure have been cloned\n");
 				
 				//checking the validity of created patch
-				//assert(o_patch);
-				pcinfo("\n\n assert : skipped \n\n");
-				pcinfo("\n the schema to json : %s",pc_schema_to_json(o_patch->schema));
-				pcinfo("\n the stats to json : %s",pc_stats_to_json(o_patch->stats));
-				pcinfo("\n \n \n the patch to json : %s \n" , pc_patch_to_string((PCPATCH * ) o_patch));
+				assert(o_patch);
 				
+				//pcinfo("\n the schema to json : %s \n",pc_schema_to_json(o_patch->schema));
+				
+				//pcinfo("\n the stats to json : %s \n",pc_stats_to_json(o_patch->stats));
+				//pcinfo("\n \n \n the patch to json : %s \n" , pc_patch_to_string((PCPATCH * ) o_patch));
+				
+			 
 				pcinfo("returning");
 				//return patch;	
 				

@@ -11,6 +11,7 @@
 
 #include "pc_api.h"
 
+
 #include "postgres.h"
 #include "utils/elog.h"
 
@@ -120,3 +121,6 @@ uint8_t* pc_patch_to_geometry_wkb_envelope(const SERIALIZED_PATCH *pa, const PCS
 uint32 pcid_from_datum(Datum d);
 
 PCSTATS* pc_patch_stats_deserialize(const PCSCHEMA *schema, const uint8_t *buf);
+
+/** return a serpatch struct as a string for convenient debug */
+char* pc_serpatch_to_string(const SERIALIZED_PATCH *serpatch, const PCSCHEMA *schema);

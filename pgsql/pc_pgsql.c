@@ -16,6 +16,7 @@
 #include "access/hash.h"
 #include "utils/hsearch.h"
 
+
 PG_MODULE_MAGIC;
 
 /**********************************************************************************
@@ -1024,44 +1025,22 @@ pc_serpatch_to_string(const SERIALIZED_PATCH *sp, const PCSCHEMA *schema)
 }
 SERIALIZED_PATCH;
 */
-
-/* { "pcid":1, "points":[[<dim1>, <dim2>, <dim3>, <dim4>],[<dim1>, <dim2>, <dim3>, <dim4>]] }*/
-	stringbuffer_t *sb = stringbuffer_create();
+ 
+	//stringbuffer_t *sb = stringbuffer_create();
 	char * str;
 
+	pcinfo( "{\"size\":%d,\"pcid\":%d,\"compression\":%d,\"npoints\":%d,\"bounds\":%s }", 
+		sp->size, sp->pcid, sp->compression, sp->npoints, pc_bounds_to_string(&(sp->bounds) ) );
+	/*	
 	stringbuffer_aprintf(sb, 
-		"{\"size\":%d,\"pcid\":%d,\"compression\":%d,\"npoints\":%d,\"bounds\":%d,[", 
-		sp->size,
+		"{\"size\":%d,\"pcid\":%d,\"compression\":%d,\"npoints\":%d,\"bounds\":%s }", 
+		sp->size, sp->pcid, sp->compression, sp->npoints, &pc_bounds_to_string(sp->bounds) );
 		);
-	for ( i = 0; i < pl->npoints; i++ )
-	{
-		PCPOINT *pt = pc_pointlist_get_point(pl, i);
-		if ( i )
-		{
-			stringbuffer_append(sb, ",");
-		}
-		stringbuffer_append(sb, "[");
-		for ( j = 0; j < pt->schema->ndims; j++ )
-		{
-			double d;
-			if ( ! pc_point_get_double_by_index(pt, j, &d))
-			{
-				pcerror("%s: unable to read double at index %d", __func__, j);
-			}
-			if ( j )
-			{
-				stringbuffer_append(sb, ",");
-			}
-			stringbuffer_aprintf(sb, "%g", d);
-		}
-		stringbuffer_append(sb, "]");
-	}
-	stringbuffer_append(sb, "]}");
-
-	/* All done, copy and clean up */
+	
+ 
 	pc_pointlist_free(pl);
 	str = stringbuffer_getstringcopy(sb);
 	stringbuffer_destroy(sb);
-
+*/
 	return str;
 }
