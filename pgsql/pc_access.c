@@ -547,8 +547,47 @@ Datum pcpatch_subset(PG_FUNCTION_ARGS)
 		patch = pc_patch_deserialize( serpa,schema);
 		
 		
-		//taking care of the second argument which is a TEXT[] containing the dimension to keep
-				
+			/////////////////////////////
+			//taking care of the second argument which is a TEXT[] containing the dimension to keep
+			
+			pcinfo("trying to retrieve text argument \n ");
+			
+				int i;
+				Datum dimensions = PG_GETARG_DATUM(1);
+				   if (PointerIsValid(DatumGetPointer(dimensions)))
+					{
+						
+						pcinfo("point isvalid\n");
+						ArrayType  *array;
+						Datum      *dimdatums;
+						int         ndim;
+						array = DatumGetArrayTypeP(dimensions);
+						Assert(ARR_ELEMTYPE(array) == TEXTOID);
+						pcinfo("after assert \n");
+						deconstruct_array(array, TEXTOID, -1, false, 'i',
+										  &dimdatums, NULL, &ndim);
+						
+						pcinfo(" number of found dim  : %d \n",ndim);
+						
+						//construct the array to hold the result :
+						char ** final_dimension_array = (char **) pcalloc(ndim * sizeof(char * ) ); 
+						
+						for (i = 0; i < ndim; i++)
+						{
+								  text       *dimensiontext = DatumGetTextP(dimdatums[i]);
+									char       *text_str = VARDATA(dimensiontext);
+									int         text_len = VARSIZE(dimensiontext) - VARHDRSZ;
+									char       *s;
+									char       *p;
+									s = TextDatumGetCString(dimdatums[i]);
+									final_dimension_array[i] = s;
+						}
+						pcinfo("end of the text retrieval\n");
+						pcinfo("trying to see whats inside : %s %s\n", final_dimension_array[0],final_dimension_array[1]);
+					}
+			/////////////////////////////
+		
+			/*	
 				ArrayType *arrptr = PG_GETARG_ARRAYTYPE_P(1);
 				int nelems;
 				int i3;
@@ -566,7 +605,7 @@ Datum pcpatch_subset(PG_FUNCTION_ARGS)
 					elog(INFO, "elem %d of dim_array : %s\n",i3,cstring_array[i3]);
 				}
 			 //text *dim_name = PG_GETARG_TEXT_P(1);
-			 
+			 */
  
 			/*
 				//if ( ARR_ELEMTYPE(arrptr) !=  text*  )
