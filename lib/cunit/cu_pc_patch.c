@@ -512,7 +512,7 @@ test_patch_filter()
 
 
 /**
-* Test the function which clone a patch keeping only a part of dimensions
+* Test the function which clone a patch keeping only a part of dimensions, numerous print to see what happens
 */
 static void
 test_patch_subset()
@@ -536,8 +536,8 @@ test_patch_subset()
     {
         PCPOINT *pt1 = pc_point_make(simpleschema);
         PCPOINT *pt2 = pc_point_make(simpleschema);
-        pc_point_set_double_by_name(pt1, "x", i);
-        pc_point_set_double_by_name(pt1, "y", i);
+        pc_point_set_double_by_name(pt1, "x", i*2.8);
+        pc_point_set_double_by_name(pt1, "y", i*1.3);
         pc_point_set_double_by_name(pt1, "Z", i*0.1);
         pc_point_set_double_by_name(pt1, "intensity", 100-i);
         pc_pointlist_add_point(pl1, pt1);
@@ -552,16 +552,15 @@ test_patch_subset()
 
     pa1 = (PCPATCH*)pc_patch_dimensional_from_pointlist(pl1);
 
-     
-    printf("pa1\n%s\n", pc_patch_to_string(pa1));
-    
-     CU_ASSERT(0 == 0);
+
+    //printf("pa1\n%s\n", pc_patch_to_string(pa1));
+ 
     
     //testing the function :
-    printf("testing the dimension-reduction function\n");
-    printf("\n\n	position of x : %i \n\n",pc_schema_get_dimension_position_by_name(pa1->schema, "x"));
+   // printf("testing the dimension-reduction function\n");
+    //printf("\n\n	position of x : %i \n\n",pc_schema_get_dimension_position_by_name(pa1->schema, "x"));
     uint32_t new_dim_number = 2; 
-	char *dim_to_keep[] = { "x", "y", "Z"}; 
+	char *dim_to_keep[] = {  "y", "x" }; 
 	uint32_t dim_position[2];
 	int i2 ;
 	
@@ -574,11 +573,11 @@ test_patch_subset()
 		}
 	printf("\n");
 	* */
-	 printf("\n the original schema to json : %s",pc_schema_to_json(pa1->schema));
+	 //printf("\n the original schema to json : %s",pc_schema_to_json(pa1->schema));
 	 //test of pc_bounds_to_string(PCBOUNDS *b) 
 	 
 	 //testing the function pc_patch_dimensional_bytes_array_to_string
-	 printf(" the original PCBYTES array :%s",pc_patch_dimensional_bytes_array_to_string((PCPATCH_DIMENSIONAL*)pa1));
+	 //printf(" the original PCBYTES array :%s",pc_patch_dimensional_bytes_array_to_string((PCPATCH_DIMENSIONAL*)pa1));
     
     //testing dimstat function :
 		//creating dimstats
@@ -588,24 +587,27 @@ test_patch_subset()
 		//PCDIMSTATS * o_dimstats = pc_dimstats_clone_subset(pds,dim_position, new_dim_number);
 	
 	//testing reduce_dimension function
-    printf("\n \n beginning test of patch_reduce_dimension \n ");
+    //printf("\n \n beginning test of patch_reduce_dimension \n ");
     pa3 = pc_patch_reduce_dimension(pa1, dim_to_keep, new_dim_number);
     
-    printf("\n the schema to json : %s",pc_schema_to_json(pa3->schema));
-    printf("\n the stats to json : %s",pc_stats_to_json(pa3->stats));
-    printf("\n \n \n the patch to json : %s" , pc_patch_to_string(pa3));
+    //printf("\n the schema to json : %s",pc_schema_to_json(pa3->schema));
+   // printf("\n the stats to json : %s",pc_stats_to_json(pa3->stats));
+   // printf("\n \n \n the patch to json : %s" , pc_patch_to_string(pa3));
     
-	printf(" the  pa3 PCBYTES array :%s",pc_patch_dimensional_bytes_array_to_string((PCPATCH_DIMENSIONAL*)pa3)); 
+	//printf(" the  pa3 PCBYTES array :%s",pc_patch_dimensional_bytes_array_to_string((PCPATCH_DIMENSIONAL*)pa3)); 
    
     //test of the serialize / deserialize function to emulate the pc_acess top function
     
     //test on the result pathc :
 		 //test of pc_bounds_to_string(PCBOUNDS *b)
-			printf("the bounds of pa3 : %s \n",  pc_bounds_to_string( &(pa3->bounds) ) );
-		//casting patch to pointlist
-			PCPOINTLIST * pl = pc_pointlist_from_patch(pa3);
+			//printf("the bounds of pa3 : %s \n",  pc_bounds_to_string( &(pa3->bounds) ) );
+		 
+	//the test on result patch : should return a new patch with only Y and X dimension
 	
-   // CU_ASSERT(0 == 1);
+	// printf("%s",pc_patch_to_string( pa3));
+	
+	 CU_ASSERT_STRING_EQUAL(pc_patch_to_string( pa3), "{\"pcid\":0,\"pts\":[[0,0],[1.3,2.8],[2.6,5.6],[3.9,8.4],[5.2,11.2],[6.5,14],[7.8,16.8],[9.1,19.6],[10.4,22.4],[11.7,25.2],[13,28],[14.3,30.8],[15.6,33.6],[16.9,36.4],[18.2,39.2],[19.5,42],[20.8,44.8],[22.1,47.6],[23.4,50.4],[24.7,53.2]]}");
+ 
     return;
 		//test on schema :
 		
