@@ -520,20 +520,16 @@ pc_patch_dimensional_serialize(const PCPATCH *patch_in)
 	int i;
 	uint8_t *buf;
 	size_t serpch_size = pc_patch_serialized_size(patch_in);
-	pcinfo("	dim serialisation : size of serpatch: %zu\n",serpch_size);
-	pcinfo("	dim serialisation : allocating \n");
 	SERIALIZED_PATCH *serpch = pcalloc(serpch_size);
 	const PCPATCH_DIMENSIONAL *patch = (PCPATCH_DIMENSIONAL*)patch_in;
-	pcinfo("	dim serialisation : asserting\n");
 	assert(patch_in);
 	assert(patch_in->type == PC_DIMENSIONAL);
-	pcinfo("	dim serialisation : just copied \n");
 	/* Copy basics */
 	serpch->pcid = patch->schema->pcid;
 	serpch->npoints = patch->npoints;
 	serpch->bounds = patch->bounds;
 	serpch->compression = patch->type;
-	pcinfo("	dim serialisation : just copied basic : pcid : %d, npoints : %d, compression :%d,  bounds\n", serpch->pcid,serpch->npoints,serpch->compression );
+	//pcinfo("	dim serialisation : just copied basic : pcid : %d, npoints : %d, compression :%d,  bounds\n", serpch->pcid,serpch->npoints,serpch->compression );
 
 	/* Get a pointer to the data area */
 	buf = serpch->data;
@@ -541,8 +537,6 @@ pc_patch_dimensional_serialize(const PCPATCH *patch_in)
 	/* Write stats into the buffer */
 	if ( patch->stats )
 	{
-			pcinfo("	dim serialisation : serializubng stats : %s\n",pc_stats_to_json(patch->stats) );
-
 		buf += pc_patch_stats_serialize(buf, patch->schema, patch->stats);
 	}
 	else
@@ -553,13 +547,11 @@ pc_patch_dimensional_serialize(const PCPATCH *patch_in)
 	/* Write each dimension in after the stats */
 	for ( i = 0; i < patch->schema->ndims; i++ )
 	{
-			pcinfo("	dim serialisation : writing dim %d\n",i);
 		size_t bsize = 0;
 		PCBYTES *pcb = &(patch->bytes[i]);
 		pc_bytes_serialize(pcb, buf, &bsize);
 		buf += bsize;
 	}
-	pcinfo("	dim serialisation : setting varsize of serpch to %zu: \n",serpch_size  );
 	SET_VARSIZE(serpch, serpch_size);
 	return serpch;
 }
@@ -666,7 +658,6 @@ pc_patch_serialize(const PCPATCH *patch_in, void *userdata)
 {
 	PCPATCH *patch = (PCPATCH*)patch_in;
 	SERIALIZED_PATCH *serpatch = NULL;
-	pcinfo("serializing in pc_patch_serialize \n");
 	/*
 	* Ensure the patch has stats calculated before going on
 	*/
@@ -693,7 +684,6 @@ pc_patch_serialize(const PCPATCH *patch_in, void *userdata)
 	}
 	case PC_DIMENSIONAL:
 	{
-			pcinfo("	dimensionnal patch type\n");
 		serpatch = pc_patch_dimensional_serialize(patch);
 		break;
 	}

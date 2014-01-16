@@ -217,12 +217,12 @@ pc_schema_clone_subset(  PCSCHEMA *s, uint32_t * dimensions_position_array, uint
 	int i;
 	PCDIMENSION* temp_dim;
 	PCSCHEMA *pcs = pc_schema_new(dimensions_number);
-	pcs->pcid = 10;//s->pcid;
+	pcs->pcid = s->pcid;
 	pcs->srid = s->srid;
 	
 	pcs->compression = s->compression;
 	
-	printf("\n for loop \n");
+	//printf("\n for loop \n");
 	for ( i = 0; i < dimensions_number; i++ )
 	{
 		if ( s->dims[dimensions_position_array[i]] )
@@ -239,10 +239,8 @@ pc_schema_clone_subset(  PCSCHEMA *s, uint32_t * dimensions_position_array, uint
 		//looking for X and Y in dimension, to get the dimension position
 	pcs->x_position=pc_schema_get_dimension_position_by_name(pcs,"x");
 	pcs->y_position=pc_schema_get_dimension_position_by_name(pcs,"y");
-	//pcs->x_position = s->x_position; 
-	//pcs->y_position = s->y_position;
-	
-	pcinfo("updating schema : x_position : %d, y_position : %d",pcs->x_position,pcs->y_position);
+
+	//pcinfo("updating schema : x_position : %d, y_position : %d",pcs->x_position,pcs->y_position);
 	pc_schema_calculate_byteoffsets(pcs);
 
 	return pcs;
@@ -673,6 +671,7 @@ pc_schema_get_dimension_position_by_name(const PCSCHEMA *s, const char *name)
 		temp = pc_schema_get_dimension_by_name(s, name);
 		if(temp == NULL) {
 			return -1;
+			pcerror("error, the dimension %s doesn't exit in the schema %s \n",name,pc_schema_to_json(s));
 		}
 		else {
 			return temp->position;

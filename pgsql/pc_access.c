@@ -554,36 +554,39 @@ Datum pcpatch_subset(PG_FUNCTION_ARGS)
 		
 		//get input text[], convert it to an array of cstring, check that the asked dimensions exist in the schema.
 			//get input text[] and convert it to cstring
-					pcinfo("trying to retrieve text argument \n "); 
+					//pcinfo("trying to retrieve text argument \n "); 
 				final_dimension_array = pccstringarray_from_Datum(PG_GETARG_DATUM(1),&ndim);
 			
 			//check that the asked dimensions exist in the schema
-					pcinfo("checking that %d input dimension names exist in schema \n",ndim);
+					//pcinfo("checking that %d input dimension names exist in schema \n",ndim);
 				for(i=0;i<ndim;i++)
 				{
 					if((j=pc_schema_get_dimension_position_by_name(schema, final_dimension_array[i])) == -1 )
 						{pcerror("error, you asked to keep the dimension  ░▒▓%s▓▒░, yet this dimension doesn't exist in the schema %s\n"
 							,final_dimension_array[i],pc_schema_to_json(schema));
 						}
-					pcinfo(" the dimension %s has position %d and exists \n",final_dimension_array[i],j);
+					//pcinfo(" the dimension %s has position %d and exists \n",final_dimension_array[i],j);
 				}
 				
 		//reduce the patch dimension without decompressing it 
-				pcinfo("reducing the dimensionnality of the patch");
+				//pcinfo("reducing the dimensionnality of the patch");
 			patch_output = pc_patch_reduce_dimension(patch,final_dimension_array,ndim);
 			schema = patch_output->schema;
 			
+		//printing the result
+			pcinfo("the reduced dimnesionnality patch : %s",pc_patch_to_string(patch_output));
+		
 		//serialization
-				pcinfo("serializing the reduced patch");
+				//pcinfo("serializing the reduced patch");
 			serpa_out = pc_patch_serialize(patch_output, NULL);
 			
 		//clean up
-				pcinfo("freeing");
+				//pcinfo("freeing");
 			pc_patch_free(patch);
 			pc_patch_free(patch_output);
 			
 		//returning result
-				pcinfo("returning pointer to serpatch");
+				//pcinfo("returning pointer to serpatch");
 			PG_RETURN_POINTER(serpa_out);
 		
 		

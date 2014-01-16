@@ -57,15 +57,12 @@ pc_patch_dimensional_clone_subset_of_bytes(PCBYTES * bytes, uint32_t * dimension
 	PCBYTES * o_bytes = pcalloc(dimensions_number * sizeof(PCBYTES));
 	
 	//loop on dimension to keep, for each dimension to keep, copy byte content into output
-	
 	for ( i = 0; i < dimensions_number; i++ )
 	{
 		if ( sizeof(bytes[dimensions_position_array[i]]) != 0L)
 		{
-				
-				o_bytes[i] = pc_bytes_clone( bytes[dimensions_position_array[i]] ) ; 
-				
-			printf("cloning the bytes of dimension %d in new position %d\n",dimensions_position_array[i],i);
+			o_bytes[i] = pc_bytes_clone( bytes[dimensions_position_array[i]] ) ; 
+				//printf("cloning the bytes of dimension %d in new position %d\n",dimensions_position_array[i],i);
 		}
 	}
 	
