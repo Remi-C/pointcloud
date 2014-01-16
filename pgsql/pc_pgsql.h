@@ -124,3 +124,7 @@ PCSTATS* pc_patch_stats_deserialize(const PCSCHEMA *schema, const uint8_t *buf);
 
 /** return a serpatch struct as a string for convenient debug */
 char* pc_serpatch_to_string(const SERIALIZED_PATCH *serpatch, const PCSCHEMA *schema);
+
+/** Takes a pointer to a text[] datum and convert it to a cstring array for convenient use*/
+char ** pccstringarray_from_Datum(Datum input_datum,int* ndim);
+

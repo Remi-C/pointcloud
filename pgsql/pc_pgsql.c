@@ -1044,3 +1044,53 @@ SERIALIZED_PATCH;
 */
 	return str;
 }
+/**@brief this function convert an input text[] plpgsql type (Datum) into an array of cstring. Warning, the data is no reallocated
+ * @param the input datum (must be a text[]), we do some check on it
+ * @param a pointer to an int whjciwill store ne number of element in the input array
+ * @return a pointer to an array of cstring
+ *  */
+char ** 
+pccstringarray_from_Datum(Datum input_datum,int* ndim)
+{
+	//this code is mimicked from postgres "btoptions" code
+	int i;
+	int ndims;
+	char ** final_dimension_array = (char **) pcalloc( (ndims) * sizeof(char * ) );
+	
+	Datum dimensions = input_datum;
+	
+   if (PointerIsValid(DatumGetPointer(dimensions)))
+	{
+		
+		pcinfo("point isvalid\n");
+		ArrayType  *array;
+		Datum      *dimdatums;
+		 
+		array = DatumGetArrayTypeP(dimensions);
+		Assert(ARR_ELEMTYPE(array) == TEXTOID);
+		pcinfo("after assert \n");
+		deconstruct_array(array, TEXTOID, -1, false, 'i',
+						  &dimdatums, NULL, &ndims);
+		
+		pcinfo(" number of found dim  : %d \n",ndims);
+		
+		//construct the array to hold the result :
+	 
+		
+		for (i = 0; i < ndims ; i++)
+		{
+			text *dimensiontext = DatumGetTextP(dimdatums[i]);
+			char *text_str = VARDATA(dimensiontext);
+			int  text_len = VARSIZE(dimensiontext) - VARHDRSZ;
+			char *s;
+			char *p;
+			s = TextDatumGetCString(dimdatums[i]);
+			final_dimension_array[i] = s;
+		}
+		pcinfo("end of the text retrieval\n");
+		pcinfo("trying to see whats inside : %s %s\n", final_dimension_array[0],final_dimension_array[1]);
+	}
+	ndim = &ndims;
+	return final_dimension_array;
+}
+

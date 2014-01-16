@@ -34,6 +34,7 @@ Datum pcpoint_as_bytea(PG_FUNCTION_ARGS);
 Datum pcpatch_bytea_envelope(PG_FUNCTION_ARGS);
 
 
+
 static void
 pcid_consistent(const uint32 pcid, const uint32 column_pcid)
 {
