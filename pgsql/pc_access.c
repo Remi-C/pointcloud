@@ -536,63 +536,72 @@ Datum pcpatch_subset(PG_FUNCTION_ARGS)
 		SERIALIZED_PATCH *serpa;
 		PCSCHEMA *schema ;
 		PCPATCH *patch; 
-		uint32_t new_dim_number = 3; 
-		char * dim_to_keep[4] = {"x","y","Z","intensity"}; 
+		//uint32_t new_dim_number = 3; 
+		//char * dim_to_keep[4] = {"x","y","Z","intensity"}; 
 
 		int ndim;
 		char ** final_dimension_array;
+		int i;
+		int j;
+		ndim=0;
+		j=-1;
 		
 		
+		//get input patch and deserialize it
 		serpa = PG_GETARG_SERPATCH_P(0);
 		schema = pc_schema_from_pcid(serpa->pcid, fcinfo);
 		patch = pc_patch_deserialize( serpa,schema);
 		
-		
-			/////////////////////////////
-			//taking care of the second argument which is a TEXT[] containing the dimension to keep
+		//get input text[], convert it to an array of cstring, check that the asked dimensions exist in the schema.
+			//get input text[] and convert it to cstring
+					pcinfo("trying to retrieve text argument \n "); 
+				final_dimension_array = pccstringarray_from_Datum(PG_GETARG_DATUM(1),&ndim);
 			
-			pcinfo("trying to retrieve text argument \n "); 
-			ndim=0;
-			
-			final_dimension_array = pccstringarray_from_Datum(PG_GETARG_DATUM(1),&ndim);
-			
-			pcinfo("trying to see whats inside : %s %s\n", final_dimension_array[0],final_dimension_array[1]);
-			 
-			/////////////////////////////
-
- 
-		
-		
-		pcinfo("patch we want to reduce : %s",pc_patch_to_string(patch));
-		pcinfo(" the original PCBYTES array :%s",pc_patch_dimensional_bytes_array_to_string((PCPATCH_DIMENSIONAL*)patch));
-		//pcerror("patch we want to reduce : %s",pc_patch_to_string(patch));
-		patch_output = pc_patch_reduce_dimension(patch,dim_to_keep,new_dim_number);
-		schema = patch_output->schema;
-		
-		 
-		
-			pcinfo("\n the modified PCBYTES array :%s \n",pc_patch_dimensional_bytes_array_to_string((PCPATCH_DIMENSIONAL*)patch_output));
-			//computig dimstats
-			//pds = pc_dimstats_make(patch_output->schema);
-			//pc_dimstats_update(pds,(PCPATCH_DIMENSIONAL *) patch_output );
- 
-
+			//check that the asked dimensions exist in the schema
+					pcinfo("checking that %d input dimension names exist in schema \n",ndim);
+				for(i=0;i<ndim;i++)
+				{
+					if((j=pc_schema_get_dimension_position_by_name(schema, final_dimension_array[i])) == -1 )
+						{pcerror("error, you asked to keep the dimension  ░▒▓%s▓▒░, yet this dimension doesn't exist in the schema %s\n"
+							,final_dimension_array[i],pc_schema_to_json(schema));
+						}
+					pcinfo(" the dimension %s has position %d and exists \n",final_dimension_array[i],j);
+				}
+				
+		//reduce the patch dimension without decompressing it 
+				pcinfo("reducing the dimensionnality of the patch");
+			patch_output = pc_patch_reduce_dimension(patch,final_dimension_array,ndim);
+			schema = patch_output->schema;
 			
 		//serialization
-		pcinfo("serializing");
-		serpa_out = pc_patch_serialize(patch_output, NULL);
-		pcinfo("size of the returned data : %zu",pc_patch_serialized_size( patch_output));
-		
-		//printing some info about the output serpatch
-		pc_serpatch_to_string(serpa_out, schema);
+				pcinfo("serializing the reduced patch");
+			serpa_out = pc_patch_serialize(patch_output, NULL);
 			
-		pcinfo("freeing");
-		pc_patch_free(patch);
-		pc_patch_free(patch_output);
+		//clean up
+				pcinfo("freeing");
+			pc_patch_free(patch);
+			pc_patch_free(patch_output);
+			
+		//returning result
+				pcinfo("returning pointer to serpatch");
+			PG_RETURN_POINTER(serpa_out);
 		
-		pcinfo("returning pointer");
-		PG_RETURN_POINTER(serpa_out);
-		 
+		
+		//debug print 	
+				//pcinfo("size of the returned data : %zu",pc_patch_serialized_size( patch_output));
+				//printing some info about the output serpatch
+				//pc_serpatch_to_string(serpa_out, schema);
+				//	pcinfo("patch we want to reduce : %s",pc_patch_to_string(patch));
+				//	pcinfo(" the original PCBYTES array :%s",pc_patch_dimensional_bytes_array_to_string((PCPATCH_DIMENSIONAL*)patch));
+				//pcerror("patch we want to reduce : %s",pc_patch_to_string(patch));
+					//pcinfo("\n the modified PCBYTES array :%s \n",pc_patch_dimensional_bytes_array_to_string((PCPATCH_DIMENSIONAL*)patch_output));
+					//computig dimstats
+					//pds = pc_dimstats_make(patch_output->schema);
+					//pc_dimstats_update(pds,(PCPATCH_DIMENSIONAL *) patch_output );
+				//pcinfo("size of the returned data : %zu",pc_patch_serialized_size( patch_output));
+				//printing some info about the output serpatch
+				//pc_serpatch_to_string(serpa_out, schema);
+
 }
 
 PG_FUNCTION_INFO_V1(pcpatch_numpoints);
