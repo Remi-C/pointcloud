@@ -19,7 +19,7 @@
 
 
 /** Convert XML string token to type interpretation number */
-static const char *
+const char *
 pc_interpretation_string(uint32_t interp)
 {
 	if ( interp < NUM_INTERPRETATIONS )
@@ -301,27 +301,9 @@ pc_schema_to_json(const PCSCHEMA *pcs)
 
 		for ( i = 0; i < pcs->ndims; i++ )
 		{
-			if ( pcs->dims[i] )
-			{
-				PCDIMENSION *d = pcs->dims[i];
-
-				if ( i ) stringbuffer_append(sb, ",");
-				stringbuffer_append(sb, "\n { \n");
-
-				if ( d->name )
-					stringbuffer_aprintf(sb, "  \"name\" : \"%s\",\n", d->name);
-				if ( d->description )
-					stringbuffer_aprintf(sb, "  \"description\" : \"%s\",\n", d->description);
-
-				stringbuffer_aprintf(sb, "  \"size\" : %d,\n", d->size);
-				stringbuffer_aprintf(sb, "  \"byteoffset\" : %d,\n", d->byteoffset);
-				stringbuffer_aprintf(sb, "  \"scale\" : %g,\n", d->scale);
-				stringbuffer_aprintf(sb, "  \"interpretation\" : \"%s\",\n", pc_interpretation_string(d->interpretation));
-				stringbuffer_aprintf(sb, "  \"offset\" : %g,\n", d->offset);
-
-				stringbuffer_aprintf(sb, "  \"active\" : %d\n", d->active);
-				stringbuffer_append(sb, " }");
-			}
+		 
+		  stringbuffer_append(sb,pc_dimension_to_json(pcs->dims[i] ) );  
+			 
 		}
 		stringbuffer_append(sb, "\n]\n");
 	}
@@ -359,6 +341,50 @@ void pc_schema_check_xy(PCSCHEMA *s)
 	if ( s->y_position < 0 )
 		pcerror("pc_schema_check_xy: invalid y_position '%d'", s->y_position);
 }
+
+
+/**@brief * Convert a PCSDIMENSION to a human-readable JSON string 
+ * @param the PCDIMENSION we want to print
+ * @return q pointer to the string buff describing the object
+ * */
+char *
+pc_dimension_to_json(const PCDIMENSION *d)
+{
+	int i;
+	char *str;
+	stringbuffer_t *sb = stringbuffer_create();
+	stringbuffer_append(sb, "{");
+
+	 
+			if ( d )
+			{
+				 
+
+				if ( i ) stringbuffer_append(sb, ",");
+				stringbuffer_append(sb, "\n { \n");
+
+				if ( d->name )
+					stringbuffer_aprintf(sb, "  \"name\" : \"%s\",\n", d->name);
+				if ( d->description )
+					stringbuffer_aprintf(sb, "  \"description\" : \"%s\",\n", d->description);
+
+				stringbuffer_aprintf(sb, "  \"size\" : %d,\n", d->size);
+				stringbuffer_aprintf(sb, "  \"byteoffset\" : %d,\n", d->byteoffset);
+				stringbuffer_aprintf(sb, "  \"scale\" : %g,\n", d->scale);
+				stringbuffer_aprintf(sb, "  \"interpretation\" : \"%s\",\n", pc_interpretation_string(d->interpretation));
+				stringbuffer_aprintf(sb, "  \"offset\" : %g,\n", d->offset);
+
+				stringbuffer_aprintf(sb, "  \"active\" : %d\n", d->active);
+				stringbuffer_append(sb, " }");
+			}
+		 
+	stringbuffer_append(sb, "}\n");
+	str = stringbuffer_getstringcopy(sb);
+	stringbuffer_destroy(sb);
+	return str;
+}
+
+
 
 static char *
 xml_node_get_content(xmlNodePtr node)

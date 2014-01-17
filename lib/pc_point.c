@@ -113,6 +113,7 @@ pc_point_get_double_by_index(const PCPOINT *pt, uint32_t idx, double *d)
 int
 pc_point_set_double(PCPOINT *pt, const PCDIMENSION *dim, double val)
 {
+	//pcinfo("the dim : \n%s\n\n", pc_dimension_to_json(dim));
 	uint8_t *ptr;
 
 	/* Remove scale and offsets */
@@ -221,7 +222,7 @@ pc_point_from_double_array(const PCSCHEMA *s, double *array, uint32_t nelems)
 	pt->readonly = PC_FALSE;
 
 	for ( i = 0; i < nelems; i++ )
-	{
+	{ 
 		if ( PC_FAILURE == pc_point_set_double_by_index(pt, i, array[i]) )
 		{
 			pcerror("failed to write value into dimension %d in pc_point_from_double_array", i);

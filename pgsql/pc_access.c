@@ -43,6 +43,7 @@ Datum pcpatch_agg_final_pcpatch(PG_FUNCTION_ARGS);
 
 /* Deaggregation functions */
 Datum pcpatch_unnest(PG_FUNCTION_ARGS);
+Datum pcpatch_unnest_reduce_dimension(PG_FUNCTION_ARGS);
 
 /**
 * Read a named dimension from a PCPOINT
@@ -515,6 +516,160 @@ Datum pcpatch_unnest(PG_FUNCTION_ARGS)
 		SRF_RETURN_DONE(funcctx);
 	}
 }
+
+
+PG_FUNCTION_INFO_V1(pcpatch_unnest_reduce_dimension);
+Datum pcpatch_unnest_reduce_dimension(PG_FUNCTION_ARGS)
+{
+	typedef struct
+	{
+		int nextelem;
+		int numelems;
+		PCPOINTLIST *pointlist;
+		PCSCHEMA * reduced_schema;
+	} pcpatch_unnest_reduce_dimension_fctx;
+
+	FuncCallContext *funcctx;
+	pcpatch_unnest_reduce_dimension_fctx *fctx;
+	MemoryContext oldcontext;
+
+	/* stuff done only on the first call of the function */
+	if (SRF_IS_FIRSTCALL())
+	{
+		PCPATCH *patch;
+		PCPATCH *patch_output;
+		SERIALIZED_PATCH *serpatch;
+		PCSCHEMA * schema;
+		int i;
+		int j ;
+		int ndim;
+		char ** final_dimension_array;
+		Datum temp_text_array_datum;
+		ndim=0;
+
+		
+		
+				
+		/* create a function context for cross-call persistence */
+		funcctx = SRF_FIRSTCALL_INIT();
+
+		/*
+		* switch to memory context appropriate for multiple function calls
+		*/
+		oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
+		
+		/*
+		* Get the patch value and detoast if needed.  We can't do this
+		* earlier because if we have to detoast, we want the detoasted copy
+		* to be in multi_call_memory_ctx, so it will go away when we're done
+		* and not before.      (If no detoast happens, we assume the originally
+		* passed array will stick around till then.)
+		*/
+		//getting the serialized patch
+		pcinfo("getting serpatch\n");
+		serpatch = PG_GETARG_SERPATCH_P(0);
+		funcctx->max_calls = serpatch->npoints; //setting the max number of call : one per point to output
+		pc_serpatch_to_string(serpatch,NULL);
+		//getting the schema
+		pcinfo("getting schema\n");
+		//schema = pc_schema_from_pcid(serpatch->pcid, fcinfo); //doesn't work because we need to writte the schema in the cache
+		schema = pc_schema_from_pcid_uncached(serpatch->pcid);
+		//getting the text[] that represent the dimensions we want to keep
+		pcinfo("getting text[] content\n");
+		temp_text_array_datum = PG_GETARG_DATUM(1);
+		final_dimension_array = pccstringarray_from_Datum(temp_text_array_datum,&ndim);
+			for(i=0;i<ndim;i++)
+					{
+						if((j=pc_schema_get_dimension_position_by_name(schema, final_dimension_array[i])) == -1 )
+							{pcerror("error, you asked to keep the dimension  ░▒▓%s▓▒░, yet this dimension doesn't exist in the schema %s\n"
+								,final_dimension_array[i],pc_schema_to_json(schema));
+							}
+						//pcinfo(" the dimension %s has position %d and exists \n",final_dimension_array[i],j);
+					}
+		
+		//deserializing
+		pcinfo("deserializing\n");
+		patch = pc_patch_deserialize(serpatch, schema);
+		
+		//reducing the number of dimension
+		pcinfo("reducing number of dims\n");
+		patch_output = pc_patch_reduce_dimension(patch,final_dimension_array,ndim);
+		
+		//updating schema with new schema (containing less dimensions)
+		pcinfo("updating schema\n");
+		schema = pc_schema_clone(patch_output->schema);
+		
+		
+		//freeing unneeded patch :
+		pcinfo("freeing\n");
+		pcfree(patch);
+
+		/* allocate memory for user context */
+		pcinfo("allocating mem\n");
+		fctx = (pcpatch_unnest_reduce_dimension_fctx *) palloc(sizeof(pcpatch_unnest_reduce_dimension_fctx));
+
+		/* initialize state */
+		pcinfo("initialize stat\n");
+		fctx->nextelem = 0;
+		fctx->numelems = patch_output->npoints;
+		pcinfo("pcpointlist from reduced patch \n");
+		pcinfo("patch we want to extract point of : \n%s",pc_patch_to_string(patch_output));
+		fctx->reduced_schema = schema; //saving the reduced schema
+		fctx->pointlist = pc_pointlist_from_patch(patch_output);
+
+		/* save user context, switch back to function context */
+		pcinfo("saving user context\n");
+		funcctx->user_fctx = fctx;
+		MemoryContextSwitchTo(oldcontext);
+	}
+
+	/* stuff done on every call of the function */
+	pcinfo("every call of unnest_reduce_dimension: switching function\n");
+	funcctx = SRF_PERCALL_SETUP();
+	fctx = funcctx->user_fctx;
+
+	if (fctx->nextelem < fctx->numelems)
+	{
+		pcinfo("another point to output\n");
+		
+		Datum * transdatums = (Datum * )  pcalloc(fctx->reduced_schema->ndims * sizeof(Datum) ) ;
+        ArrayType  *result;
+        int i;
+        double temp_double;
+        PCPOINT * pt = pc_pointlist_get_point(fctx->pointlist, fctx->nextelem);
+        for(i=0;i<fctx->reduced_schema->ndims;i++) {
+			pc_point_get_double_by_index(pt,i, &temp_double);
+			pcinfo("putting the double %f in memory",temp_double);
+			//transdatums[i]=  Float8GetDatumFast(temp_double);
+			transdatums[i]=  Float8GetDatum(temp_double);
+		}
+        
+        result = construct_array(transdatums, fctx->reduced_schema->ndims,
+                                 FLOAT8OID,
+                                 sizeof(float8), FLOAT8PASSBYVAL, 'd');
+        //PG_RETURN_ARRAYTYPE_P(result);
+        
+        fctx->nextelem++;
+		//SRF_RETURN_NEXT(funcctx, *transdatums);
+		SRF_RETURN_NEXT(funcctx, PointerGetDatum(result));
+		
+		/* //this wont work: need ot output an array of float
+		Datum elem;
+		PCPOINT *pt = pc_pointlist_get_point(fctx->pointlist, fctx->nextelem);
+		SERIALIZED_POINT *serpt = pc_point_serialize(pt);
+		fctx->nextelem++;
+		elem = PointerGetDatum(serpt);
+		SRF_RETURN_NEXT(funcctx, elem);
+		* */
+	}
+	else
+	{
+		pcinfo("end of function\n");
+		/* do when there is no more left */
+		SRF_RETURN_DONE(funcctx);
+	}
+}
+
 
 PG_FUNCTION_INFO_V1(pcpatch_uncompress);
 Datum pcpatch_uncompress(PG_FUNCTION_ARGS)

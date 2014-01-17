@@ -124,6 +124,7 @@ pc_double_from_ptr(const uint8_t *ptr, uint32_t interpretation)
 int
 pc_double_to_ptr(uint8_t *ptr, uint32_t interpretation, double val)
 {
+	
 	switch( interpretation )
 	{
 	case PC_UINT8:
@@ -188,7 +189,7 @@ pc_double_to_ptr(uint8_t *ptr, uint32_t interpretation, double val)
 	}
 	default:
 	{
-		pcerror("unknown interpretation type %d encountered in pc_double_to_ptr", interpretation);
+		pcerror("unknown interpretation type \"%s\" encountered in pc_double_to_ptr", pc_interpretation_string( interpretation ));
 		return PC_FAILURE;
 	}
 	}

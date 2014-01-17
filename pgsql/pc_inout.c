@@ -91,10 +91,12 @@ Datum pcpoint_in(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(pcpoint_out);
 Datum pcpoint_out(PG_FUNCTION_ARGS)
 {
+
 	PCPOINT *pcpt = NULL;
 	PCSCHEMA *schema = NULL;
 	SERIALIZED_POINT *serpt = NULL;
 	char *hexwkb = NULL;
+ 
 
 	serpt = PG_GETARG_SERPOINT_P(0);
 	schema = pc_schema_from_pcid(serpt->pcid, fcinfo);
@@ -148,7 +150,7 @@ Datum pcpatch_in(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(pcpatch_out);
 Datum pcpatch_out(PG_FUNCTION_ARGS)
 {
-		pcinfo("\n  pcpatch out \n");
+
 	PCPATCH *patch = NULL;
 	SERIALIZED_PATCH *serpatch = NULL;
 	char *hexwkb = NULL;
@@ -226,6 +228,7 @@ Datum pcpoint_from_double_array(PG_FUNCTION_ARGS)
 	if ( nelems != schema->ndims || ARR_LBOUND(arrptr)[0] > 1 )
 		elog(ERROR, "array dimenensions do not match schema dimensions of pcid = %d", pcid);
 
+	//pcinfo("the schema : \n%s\n", pc_schema_to_json(schema));
 	vals = (float8*) ARR_DATA_PTR(arrptr);
 	pt = pc_point_from_double_array(schema, vals, nelems);
 
@@ -237,6 +240,7 @@ Datum pcpoint_from_double_array(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(pcpoint_as_text);
 Datum pcpoint_as_text(PG_FUNCTION_ARGS)
 {
+	pcinfo("into pcpppoint as text\n");
 	SERIALIZED_POINT *serpt = PG_GETARG_SERPOINT_P(0);
 	text *txt;
 	char *str;
@@ -273,6 +277,7 @@ Datum pcpatch_as_text(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(pcpoint_as_bytea);
 Datum pcpoint_as_bytea(PG_FUNCTION_ARGS)
 {
+		pcinfo("into pcpoint as bytea \n");
 	SERIALIZED_POINT *serpt = PG_GETARG_SERPOINT_P(0);
 	uint8 *bytes;
 	size_t bytes_size;

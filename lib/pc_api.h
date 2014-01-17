@@ -265,6 +265,8 @@ void pc_schema_free(PCSCHEMA *pcs);
 int pc_schema_from_xml(const char *xmlstr, PCSCHEMA **schema);
 /** Print out JSON readable format of schema */
 char* pc_schema_to_json(const PCSCHEMA *pcs);
+/** Print a JSOn readable format of a PCDIMENSION */
+char * pc_dimension_to_json(const PCDIMENSION *pcs);
 /** Extract dimension information by position */
 PCDIMENSION* pc_schema_get_dimension(const PCSCHEMA *s, uint32_t dim);
 /** Extract dimension information by name */
