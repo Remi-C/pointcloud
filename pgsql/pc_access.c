@@ -566,16 +566,16 @@ Datum pcpatch_unnest_reduce_dimension(PG_FUNCTION_ARGS)
 		* passed array will stick around till then.)
 		*/
 		//getting the serialized patch
-		pcinfo("getting serpatch\n");
+				//pcinfo("getting serpatch\n");
 		serpatch = PG_GETARG_SERPATCH_P(0);
 		funcctx->max_calls = serpatch->npoints; //setting the max number of call : one per point to output
 		pc_serpatch_to_string(serpatch,NULL);
 		//getting the schema
-		pcinfo("getting schema\n");
+				//pcinfo("getting schema\n");
 		//schema = pc_schema_from_pcid(serpatch->pcid, fcinfo); //doesn't work because we need to writte the schema in the cache
 		schema = pc_schema_from_pcid_uncached(serpatch->pcid);
 		//getting the text[] that represent the dimensions we want to keep
-		pcinfo("getting text[] content\n");
+				//pcinfo("getting text[] content\n");
 		temp_text_array_datum = PG_GETARG_DATUM(1);
 		final_dimension_array = pccstringarray_from_Datum(temp_text_array_datum,&ndim);
 			for(i=0;i<ndim;i++)
@@ -588,49 +588,49 @@ Datum pcpatch_unnest_reduce_dimension(PG_FUNCTION_ARGS)
 					}
 		
 		//deserializing
-		pcinfo("deserializing\n");
+				//pcinfo("deserializing\n");
 		patch = pc_patch_deserialize(serpatch, schema);
 		
 		//reducing the number of dimension
-		pcinfo("reducing number of dims\n");
+				//pcinfo("reducing number of dims\n");
 		patch_output = pc_patch_reduce_dimension(patch,final_dimension_array,ndim);
 		
 		//updating schema with new schema (containing less dimensions)
-		pcinfo("updating schema\n");
+				//pcinfo("updating schema\n");
 		schema = pc_schema_clone(patch_output->schema);
 		
 		
 		//freeing unneeded patch :
-		pcinfo("freeing\n");
+				//pcinfo("freeing\n");
 		pcfree(patch);
 
 		/* allocate memory for user context */
-		pcinfo("allocating mem\n");
+				//pcinfo("allocating mem\n");
 		fctx = (pcpatch_unnest_reduce_dimension_fctx *) palloc(sizeof(pcpatch_unnest_reduce_dimension_fctx));
 
 		/* initialize state */
-		pcinfo("initialize stat\n");
+				//pcinfo("initialize stat\n");
 		fctx->nextelem = 0;
 		fctx->numelems = patch_output->npoints;
-		pcinfo("pcpointlist from reduced patch \n");
-		pcinfo("patch we want to extract point of : \n%s",pc_patch_to_string(patch_output));
+				//pcinfo("pcpointlist from reduced patch \n");
+				//pcinfo("patch we want to extract point of : \n%s",pc_patch_to_string(patch_output));
 		fctx->reduced_schema = schema; //saving the reduced schema
 		fctx->pointlist = pc_pointlist_from_patch(patch_output);
 
 		/* save user context, switch back to function context */
-		pcinfo("saving user context\n");
+				//pcinfo("saving user context\n");
 		funcctx->user_fctx = fctx;
 		MemoryContextSwitchTo(oldcontext);
 	}
 
 	/* stuff done on every call of the function */
-	pcinfo("every call of unnest_reduce_dimension: switching function\n");
+			//pcinfo("every call of unnest_reduce_dimension: switching function\n");
 	funcctx = SRF_PERCALL_SETUP();
 	fctx = funcctx->user_fctx;
 
 	if (fctx->nextelem < fctx->numelems)
 	{
-		pcinfo("another point to output\n");
+		//pcinfo("another point to output\n");
 		
 		Datum * transdatums = (Datum * )  pcalloc(fctx->reduced_schema->ndims * sizeof(Datum) ) ;
         ArrayType  *result;
@@ -639,7 +639,7 @@ Datum pcpatch_unnest_reduce_dimension(PG_FUNCTION_ARGS)
         PCPOINT * pt = pc_pointlist_get_point(fctx->pointlist, fctx->nextelem);
         for(i=0;i<fctx->reduced_schema->ndims;i++) {
 			pc_point_get_double_by_index(pt,i, &temp_double);
-			pcinfo("putting the double %f in memory",temp_double);
+					//pcinfo("putting the double %f in memory",temp_double);
 			//transdatums[i]=  Float8GetDatumFast(temp_double);
 			transdatums[i]=  Float8GetDatum(temp_double);
 		}
@@ -664,7 +664,7 @@ Datum pcpatch_unnest_reduce_dimension(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-		pcinfo("end of function\n");
+		//pcinfo("end of function\n");
 		/* do when there is no more left */
 		SRF_RETURN_DONE(funcctx);
 	}
@@ -729,7 +729,7 @@ Datum pcpatch_subset(PG_FUNCTION_ARGS)
 			schema = patch_output->schema;
 			
 		//printing the result
-			pcinfo("the reduced dimnesionnality patch : %s",pc_patch_to_string(patch_output));
+				pcinfo("the reduced dimnesionnality patch : %s",pc_patch_to_string(patch_output));
 		
 		//serialization
 				//pcinfo("serializing the reduced patch");

@@ -1019,8 +1019,8 @@ SERIALIZED_PATCH;
 	//stringbuffer_t *sb = stringbuffer_create();
 	char * str;
 
-	pcinfo( "{\"size\":%d,\"pcid\":%d,\"compression\":%d,\"npoints\":%d,\"bounds\":%s }", 
-		sp->size, sp->pcid, sp->compression, sp->npoints, pc_bounds_to_string(&(sp->bounds) ) );
+	//pcinfo( "{\"size\":%d,\"pcid\":%d,\"compression\":%d,\"npoints\":%d,\"bounds\":%s }", 
+	//	sp->size, sp->pcid, sp->compression, sp->npoints, pc_bounds_to_string(&(sp->bounds) ) );
 	/*	
 	stringbuffer_aprintf(sb, 
 		"{\"size\":%d,\"pcid\":%d,\"compression\":%d,\"npoints\":%d,\"bounds\":%s }", 

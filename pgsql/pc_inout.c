@@ -277,7 +277,7 @@ Datum pcpatch_as_text(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(pcpoint_as_bytea);
 Datum pcpoint_as_bytea(PG_FUNCTION_ARGS)
 {
-		pcinfo("into pcpoint as bytea \n");
+	
 	SERIALIZED_POINT *serpt = PG_GETARG_SERPOINT_P(0);
 	uint8 *bytes;
 	size_t bytes_size;
