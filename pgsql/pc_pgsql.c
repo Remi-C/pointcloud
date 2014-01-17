@@ -1077,7 +1077,7 @@ pccstringarray_from_Datum(Datum input_datum,int* ndim)
 			text_len = VARSIZE(dimensiontext) - VARHDRSZ;
 			s = TextDatumGetCString(dimdatums[i]);
 			final_dimension_array[i] = s;
-			pcinfo("position %d in input, dimension  %s\n",i,final_dimension_array[i]);
+			//pcinfo("position %d in input, dimension  %s\n",i,final_dimension_array[i]);
 		}
 	}
 	ndim = &ndims;

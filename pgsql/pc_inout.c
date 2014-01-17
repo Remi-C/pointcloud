@@ -240,7 +240,7 @@ Datum pcpoint_from_double_array(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(pcpoint_as_text);
 Datum pcpoint_as_text(PG_FUNCTION_ARGS)
 {
-	pcinfo("into pcpppoint as text\n");
+
 	SERIALIZED_POINT *serpt = PG_GETARG_SERPOINT_P(0);
 	text *txt;
 	char *str;
