@@ -156,6 +156,47 @@ pc_point_to_hexwkb(const PCPOINT *pt)
 	return hexwkb;
 }
 
+/**
+ * @brief : This function return a pointer to a datum araay of float8 ready to be returned to the plpgsql side
+ * @param : a point , the schema must be filled
+ * @return : a pointer to an aray of datum representing float8
+ */
+ArrayType *
+pc_point_to_float8_array_datum(PCPOINT * a_point, uint32_t * array_of_dim_position, int32_t nb_dim_to_keep)
+{
+		Datum * transdatums = (Datum * )  pcalloc(a_point->schema->ndims * sizeof(Datum) ) ;
+		ArrayType  *result;
+        int i;
+        double temp_double;
+        int32_t ndims = nb_dim_to_keep ;
+        uint32_t * d_a = array_of_dim_position;
+		
+		//case when we want all the dimension, it's safe to get the schema
+		if(!array_of_dim_position||ndims <0) 
+		{
+			ndims = a_point->schema->ndims;
+			//we construct a dummy array of position, direct mapping
+			d_a = pcalloc( sizeof(uint32_t) * ndims );
+			for(i=0;i<ndims;i++)
+			{
+					d_a[i]=i;
+			}
+		}
+        //case when we don't want all the dimensions
+        
+        for(i=0;i<ndims;i++) {
+			pc_point_get_double_by_index(a_point,d_a[i], &temp_double);
+					//pcinfo("putting the double %f in memory",temp_double);
+			//transdatums[i]=  Float8GetDatumFast(temp_double);
+			transdatums[i]=  Float8GetDatum(temp_double);
+		}
+        
+        result = construct_array(transdatums,ndims,
+                                 FLOAT8OID,
+                                 sizeof(float8), FLOAT8PASSBYVAL, 'd');
+		return result;
+}
+
 
 /**********************************************************************************
 * PCPATCH WKB Handling
@@ -1053,7 +1094,7 @@ pccstringarray_from_Datum(Datum input_datum,int* ndim)
 	char *text_str  ;
 	int  text_len ;
 	char *s;
-	char *p;
+	//char *p;
 	ndims =0;
 	*ndim = ndims;
 	dimensions= input_datum;

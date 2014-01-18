@@ -22,6 +22,26 @@ CREATE OR REPLACE FUNCTION pc_explode_reducedim(p pcpatch, dimensions text[])
 '$libdir/pointcloud', 'pcpatch_unnest_reduce_dimension'
   LANGUAGE c IMMUTABLE STRICT
 
+   DROP FUNCTION IF EXISTS pc_get_all(p pcpoint);
+CREATE OR REPLACE FUNCTION pc_get_all(p pcpoint)
+  RETURNS SETOF double precision[] AS
+'$libdir/pointcloud', 'pcpoint_get_all_values'
+  LANGUAGE c IMMUTABLE STRICT;
+
+
+DROP FUNCTION IF EXISTS pc_get(pt pcpoint, dimnames text[]);
+  CREATE OR REPLACE FUNCTION pc_get(pt pcpoint, dimnames text[])
+  RETURNS double precision[] AS
+'$libdir/pointcloud', 'pcpoint_get_values'
+  LANGUAGE c IMMUTABLE STRICT;
+
+  DROP FUNCTION IF EXISTS pc_get(pt pcpoint, dimnames text[]);
+  CREATE OR REPLACE FUNCTION pc_get(pt pcpoint, dimnames text[])
+  RETURNS double precision[] AS
+'$libdir/pointcloud', 'pcpoint_get_values'
+  LANGUAGE c IMMUTABLE STRICT;
+ 
+ 
  --inserting schema
  /*
  INSERT INTO pointcloud_formats (pcid, srid, schema) VALUES (1, 4326, 
@@ -120,6 +140,28 @@ LIMIT 1 ;
 SELECT id, result
 FROM patches AS  pa, pc_explode_reducedim(pa, ARRAY['x' ,'Y' ,'Z','Intensity','z' ]) AS result
 WHERE id=2 
+
+SELECT p[1],p[2],p[3],p[4]
+FROM 
+(
+SELECT pc_get_all(result) As p
+FROM  
+ (SELECT id, result
+FROM patches AS  pa, pc_explode(pa) AS result
+WHERE id=1
+ ) as toto
+) AS titi
+
+
+ 
+SELECT pc_get(result,ARRAY['Yer' ]) As p
+FROM  
+ (SELECT id, result
+FROM patches AS  pa, pc_explode(pa) AS result
+WHERE id=1
+ ) as toto
+ 
+
 
 SELECT result[1],result[2]
 FROM  

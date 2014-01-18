@@ -198,6 +198,9 @@ Datum pcschema_get_ndims(PG_FUNCTION_ARGS)
 	PG_RETURN_INT32(ndims);
 }
 
+
+
+
 /**
 * pcpoint_from_double_array(integer pcid, float8[] returns PcPoint
 */

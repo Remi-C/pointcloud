@@ -446,6 +446,64 @@ test_patch_wkb()
 }
 
 
+
+static void
+test_patch_to_double_array()
+{
+
+    int i;
+    int npts = 20;
+    PCPOINTLIST *pl1;
+    PCPATCH_UNCOMPRESSED *pu1, *pu2;
+    PCPATCH *pa1, *pa2, *pa3, *pa4;
+    PCDIMSTATS *pds = NULL;
+    size_t z1, z2;
+    uint8_t *wkb1, *wkb2;
+    char *str;
+
+    pl1 = pc_pointlist_make(npts);
+
+    for ( i = 0; i < npts; i++ )
+    {
+        PCPOINT *pt = pc_point_make(simpleschema);
+        pc_point_set_double_by_name(pt, "x", i*2.123);
+        pc_point_set_double_by_name(pt, "y", i*2.9);
+        pc_point_set_double_by_name(pt, "Z", i*0.3099);
+        pc_point_set_double_by_name(pt, "intensity", 13);
+        pc_pointlist_add_point(pl1, pt);
+    }
+
+    pa1 = (PCPATCH*)pc_patch_dimensional_from_pointlist(pl1);
+     
+     
+    //starting the test ;
+		//testing the function double * pc_point_to_double_array(PCPOINT * a_point )
+			printf("beginning of test of patch to doule array function\n");
+			//transforming a point into a double array
+			double * result_double_array;
+			PCPOINT * pt = pc_pointlist_get_point(pl1,1);
+			printf("trying to cast to double array the point\n");
+			result_double_array = pc_point_to_double_array(pt); 
+			printf("point have been casted\n");
+			//checking the value of double array :
+			printf("\n");
+			for(i=0;i<pt->schema->ndims;i++)
+			{
+				double temp_double;
+				//printf("	dim %d, value %f",i,result_double_array[i]);
+				pc_point_get_double_by_index(pt,i,&temp_double);
+				CU_ASSERT(result_double_array[i]==temp_double);
+			}
+			printf("\n");
+			//printf("%s", pc_point_to_string(pt));
+			
+		//end of test
+    pc_pointlist_free(pl1);
+    pc_patch_free(pa1); 
+}
+
+
+
 static void
 test_patch_filter()
 {
@@ -641,6 +699,7 @@ CU_TestInfo patch_tests[] = {
 	PC_TEST(test_patch_wkb),
 	PC_TEST(test_patch_filter),
 	PC_TEST(test_patch_subset),
+	PC_TEST(test_patch_to_double_array),
 	CU_TEST_INFO_NULL
 };
 

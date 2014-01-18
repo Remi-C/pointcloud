@@ -354,3 +354,57 @@ pc_point_to_geometry_wkb(const PCPOINT *pt, size_t *wkbsize)
 	if ( wkbsize ) *wkbsize = size;
 	return wkb;
 }
+
+
+
+
+/**
+ * @brief this function convert a PCPOINT to an array of double containing all the dimension values of this point
+ * @param a pointer to the point to convert to double
+ * @return : a pointer to an array of double containing all the dimensions of the point expressed as double precision
+ * 
+ * */
+double * pc_point_to_double_array(PCPOINT * a_point )
+{
+	
+	//check that pcpoint is not null 
+	//allocate space for dimension number * double
+	//for loop on dim number
+	//	copy memory
+	//update pointerpoint to double[] , 
+	//return pointer
+	int i;
+	if(!a_point)
+		{
+			pcerror(" trying to cast the point to double[] this pointer to point is void!  \n");
+			return NULL;
+		}
+	double * d_array= (double *) pcalloc( a_point->schema->ndims * sizeof(double));
+	double temp_d_value;
+	
+ 
+	
+	for(i=0;i<a_point->schema->ndims;i++)
+	{
+		pc_point_get_double_by_index(a_point,i, &temp_d_value);
+		memcpy(&d_array[i],&temp_d_value, sizeof(double));
+	}
+	
+	return d_array;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

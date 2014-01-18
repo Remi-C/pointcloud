@@ -128,3 +128,6 @@ char* pc_serpatch_to_string(const SERIALIZED_PATCH *serpatch, const PCSCHEMA *sc
 /** Takes a pointer to a text[] datum and convert it to a cstring array for convenient use*/
 char ** pccstringarray_from_Datum(Datum input_datum,int* ndim);
 
+/** Point to float8 array datum*/
+ArrayType * pc_point_to_float8_array_datum(PCPOINT * a_point, int32_t * array_of_dim_position, int nb_dim_to_keep);
+

@@ -15,6 +15,8 @@
 
 /* General SQL functions */
 Datum pcpoint_get_value(PG_FUNCTION_ARGS);
+Datum pcpoint_get_values(PG_FUNCTION_ARGS);
+Datum pcpoint_get_all_values(PG_FUNCTION_ARGS);
 Datum pcpatch_from_pcpoint_array(PG_FUNCTION_ARGS);
 Datum pcpatch_from_pcpatch_array(PG_FUNCTION_ARGS);
 Datum pcpatch_uncompress(PG_FUNCTION_ARGS);
@@ -72,6 +74,99 @@ Datum pcpoint_get_value(PG_FUNCTION_ARGS)
 	pc_point_free(pt);
 	PG_RETURN_DATUM(DirectFunctionCall1(float8_numeric, Float8GetDatum(double_result)));
 }
+
+
+
+/**
+* @brief this function return as float8 array the dimensions asked in a text array parameter
+* @param a point whose values we want to get
+* @param a text[] with the name of the dimensions we want to retrieve
+* @return a datum for an array of float8
+*/
+PG_FUNCTION_INFO_V1(pcpoint_get_values);
+Datum pcpoint_get_values(PG_FUNCTION_ARGS)
+{
+	SERIALIZED_POINT *serpt = PG_GETARG_SERPOINT_P(0);
+	PCSCHEMA *schema;
+	PCPOINT *pt;
+	char ** final_dimension_array;
+	Datum temp_text_array_datum;
+	int i;
+	int32_t * i_array;
+	int j;
+	ArrayType  *result;
+	int ndim=0;
+	schema = pc_schema_from_pcid(serpt->pcid, fcinfo);
+	pt= pc_point_deserialize(serpt, schema);
+	
+	
+	
+	if ( ! pt )
+		PG_RETURN_NULL();
+
+
+
+	temp_text_array_datum = PG_GETARG_DATUM(1);
+	final_dimension_array = pccstringarray_from_Datum(temp_text_array_datum,&ndim);
+		
+	i_array= (int32_t *) pcalloc( ndim * sizeof(int32_t));
+
+		//mfilling i_array with the position of the dimension we want to retrieve
+			for(i=0;i<ndim;i++)
+					{
+						if((j=pc_schema_get_dimension_position_by_name(schema, final_dimension_array[i])) == -1 )
+							{pcerror("error, you asked the dimension  ░▒▓%s▓▒░, yet this dimension doesn't exist in the schema %s\n"
+								,final_dimension_array[i],pc_schema_to_json(schema));
+							}
+						i_array[i]=j; //updating the array of dimension position , for dimension we want to retrieve
+						//pcinfo(" the dimension %s has position %d and exists \n",final_dimension_array[i],j);
+					}
+			//getting the data and putting it into a double array
+			
+	
+	result = pc_point_to_float8_array_datum(pt,i_array,ndim);
+	pc_point_free(pt);
+	PG_RETURN_ARRAYTYPE_P(result);
+
+
+	
+	
+}
+
+/**
+* @brief this function returns all the values of a point as a double precision array
+* @param for remainnding  : one param : the pcpoint
+* @return an array of float8 
+*/
+PG_FUNCTION_INFO_V1(pcpoint_get_all_values);
+Datum pcpoint_get_all_values(PG_FUNCTION_ARGS)
+{
+	SERIALIZED_POINT *serpt = PG_GETARG_SERPOINT_P(0);
+	//text *dim_name = PG_GETARG_TEXT_P(1);
+	//char *dim_str;
+	 
+	ArrayType  *result;
+	PCSCHEMA *schema = pc_schema_from_pcid(serpt->pcid, fcinfo);
+	PCPOINT *pt = pc_point_deserialize(serpt, schema);
+	if ( ! pt )
+		PG_RETURN_NULL();
+
+	//dim_str = text_to_cstring(dim_name);
+	/*
+	if ( ! pc_point_get_double_by_name(pt, dim_str, &double_result) )
+	{
+		pc_point_free(pt);
+		elog(ERROR, "dimension \"%s\" does not exist in schema", dim_str);
+	}
+	*/
+	
+
+	result = pc_point_to_float8_array_datum(pt,NULL,schema->ndims);
+	pc_point_free(pt);
+	//PG_RETURN_DATUM(DirectFunctionCall1(float8_numeric, Float8GetDatum(double_result)));
+	PG_RETURN_ARRAYTYPE_P(result);
+}
+
 
 static inline bool
 array_get_isnull(const bits8 *nullbitmap, int offset)
@@ -631,36 +726,20 @@ Datum pcpatch_unnest_reduce_dimension(PG_FUNCTION_ARGS)
 	if (fctx->nextelem < fctx->numelems)
 	{
 		//pcinfo("another point to output\n");
-		
-		Datum * transdatums = (Datum * )  pcalloc(fctx->reduced_schema->ndims * sizeof(Datum) ) ;
+
         ArrayType  *result;
-        int i;
-        double temp_double;
-        PCPOINT * pt = pc_pointlist_get_point(fctx->pointlist, fctx->nextelem);
-        for(i=0;i<fctx->reduced_schema->ndims;i++) {
-			pc_point_get_double_by_index(pt,i, &temp_double);
-					//pcinfo("putting the double %f in memory",temp_double);
-			//transdatums[i]=  Float8GetDatumFast(temp_double);
-			transdatums[i]=  Float8GetDatum(temp_double);
-		}
+        PCPOINT * pt = pc_pointlist_get_point(fctx->pointlist, fctx->nextelem );
+        pt->schema = fctx->reduced_schema;
         
-        result = construct_array(transdatums, fctx->reduced_schema->ndims,
-                                 FLOAT8OID,
-                                 sizeof(float8), FLOAT8PASSBYVAL, 'd');
+		result = pc_point_to_float8_array_datum(pt,NULL,fctx->reduced_schema->ndims);
+        
+      
         //PG_RETURN_ARRAYTYPE_P(result);
         
         fctx->nextelem++;
 		//SRF_RETURN_NEXT(funcctx, *transdatums);
 		SRF_RETURN_NEXT(funcctx, PointerGetDatum(result));
-		
-		/* //this wont work: need ot output an array of float
-		Datum elem;
-		PCPOINT *pt = pc_pointlist_get_point(fctx->pointlist, fctx->nextelem);
-		SERIALIZED_POINT *serpt = pc_point_serialize(pt);
-		fctx->nextelem++;
-		elem = PointerGetDatum(serpt);
-		SRF_RETURN_NEXT(funcctx, elem);
-		* */
+	
 	}
 	else
 	{

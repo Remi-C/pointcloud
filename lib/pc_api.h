@@ -352,6 +352,9 @@ char* pc_point_to_string(const PCPOINT *pt);
 /** Return the OGC WKB version of the point */
 uint8_t* pc_point_to_geometry_wkb(const PCPOINT *pt, size_t *wkbsize);
 
+/** Return a pointer to an array of double representing a point igiven in input. Memory is allocated*/
+double * pc_point_to_double_array(PCPOINT * a_point );
+
 
 /**********************************************************************
 * PCPATCH
