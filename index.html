@@ -1,77 +1,63 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Pointcloud : A PostgreSQL extension for storing point cloud (LIDAR) data.">
+    <title>Pointcloud by Remi-C</title>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <title>Pointcloud</title>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
-
   <body>
-
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/Remi-C/pointcloud">View on GitHub</a>
-
-          <h1 id="project_title">Pointcloud</h1>
-          <h2 id="project_tagline">A PostgreSQL extension for storing point cloud (LIDAR) data.</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/Remi-C/pointcloud/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/Remi-C/pointcloud/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
+    <div class="wrapper">
+      <header>
+        <h1>Pointcloud</h1>
+        <p>A PostgreSQL extension for storing point cloud (LIDAR) data.</p>
+        <p class="view"><a href="https://github.com/Remi-C/pointcloud">View the Project on GitHub <small>Remi-C/pointcloud</small></a></p>
+        <ul>
+          <li><a href="https://github.com/Remi-C/pointcloud/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/Remi-C/pointcloud/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/Remi-C/pointcloud">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
         <h3>
 <a name="welcome-to-pgpointcloud-simple-home-site" class="anchor" href="#welcome-to-pgpointcloud-simple-home-site"><span class="octicon octicon-link"></span></a>Welcome to pgPointCloud simple home site</h3>
 
 <h4>
 <a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h4>
 
-<p><a href="https://github.com/TODO" class="user-mention">@TODO</a> : put a nice image in background
-<strong>pgPointCLoud</strong>[^pgPointCLoud]</p>
+<p><code>@TODO : put a nice image in background</code>
+Lidar point cloud are becoming more and more available. Devices are easy to get, not too expensive, and provide very accurate 3D points.
+Yet using those Billions of points is a challenge.
+<strong>pgPointCLoud</strong> is an open source PostgreSQL extension for storing point cloud (LIDAR) data and use it with PostGIS.
+It is very easy to use, robust and efficient.
+By sotring Lidar point in a PostgreSQL database, pgPointCloud ease many problems and allows a good integration with other geo-spatial data (vector,raster) into the common PostGIS framework.</p>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<h4>
+<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h4>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+<h4>
+<a name="why-use-pgpointcloud-to-store-lidar-points-into-postgresql" class="anchor" href="#why-use-pgpointcloud-to-store-lidar-points-into-postgresql"><span class="octicon octicon-link"></span></a>Why use pgPointCloud to store lidar points into postgreSQL?</h4>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<h4>
+<a name="does-pgpointcloud-scale-" class="anchor" href="#does-pgpointcloud-scale-"><span class="octicon octicon-link"></span></a>Does pgPointCloud scale ?</h4>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<p>[^pgPointCloud]: <a href="https://github.com/pramsey/pointcloud">pgPointCloud</a> is an open source PostgreSQL extension for storing point cloud (LIDAR) data and use it with postGIS.</p>
+<h4>
+<a name="resources" class="anchor" href="#resources"><span class="octicon octicon-link"></span></a>Resources</h4>
       </section>
     </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Pointcloud maintained by <a href="https://github.com/Remi-C">Remi-C</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
+    <footer>
+      <p>Project maintained by <a href="https://github.com/Remi-C">Remi-C</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
-
   </body>
 </html>
