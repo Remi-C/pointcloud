@@ -120,3 +120,6 @@ uint8_t* pc_patch_to_geometry_wkb_envelope(const SERIALIZED_PATCH *pa, const PCS
 uint32 pcid_from_datum(Datum d);
 
 PCSTATS* pc_patch_stats_deserialize(const PCSCHEMA *schema, const uint8_t *buf);
+
+/** Point to float8 array datum*/
+ArrayType * pc_point_to_float8_array_datum(PCPOINT * a_point, uint32_t * array_of_dim_position, int32_t nb_dim_to_keep);

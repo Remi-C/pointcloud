@@ -25,6 +25,8 @@ Datum pcpatch_get_stat(PG_FUNCTION_ARGS);
 Datum pcpatch_filter(PG_FUNCTION_ARGS);
 Datum pcpatch_size(PG_FUNCTION_ARGS);
 Datum pcpoint_size(PG_FUNCTION_ARGS);
+Datum pcpoint_get_values(PG_FUNCTION_ARGS);
+Datum pcpoint_get_all_values(PG_FUNCTION_ARGS);
 Datum pc_version(PG_FUNCTION_ARGS);
 
 /* Generic aggregation functions */
@@ -70,6 +72,27 @@ Datum pcpoint_get_value(PG_FUNCTION_ARGS)
 	pc_point_free(pt);
 	PG_RETURN_DATUM(DirectFunctionCall1(float8_numeric, Float8GetDatum(double_result)));
 }
+
+/**
+* @brief this function returns all the values of a point as a double precision array
+* @param for remainnding  : one param : the pcpoint
+* @return an array of float8
+*/
+PG_FUNCTION_INFO_V1(pcpoint_get_all_values);
+Datum pcpoint_get_all_values(PG_FUNCTION_ARGS)
+{
+    SERIALIZED_POINT *serpt = PG_GETARG_SERPOINT_P(0);
+    ArrayType  *result;
+    PCSCHEMA *schema = pc_schema_from_pcid(serpt->pcid, fcinfo);
+    PCPOINT *pt = pc_point_deserialize(serpt, schema);
+    if ( ! pt )
+        PG_RETURN_NULL();
+
+    result = pc_point_to_float8_array_datum(pt,NULL,schema->ndims);
+    pc_point_free(pt);
+    PG_RETURN_ARRAYTYPE_P(result);
+}
+
 
 static inline bool
 array_get_isnull(const bits8 *nullbitmap, int offset)

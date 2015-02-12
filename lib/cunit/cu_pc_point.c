@@ -136,12 +136,33 @@ test_point_access()
 	pc_point_free(pt);
 
 }
+static void
+test_point_and_double_array()
+{
+    PCPOINT *pt;
+    double before_point_data[4] = {1.0, 2.0,3.0,4.0};
+    double * after_point_data ;
+    int i = 0 ;
+    printf("toto \n") ;
+    CU_ASSERT( pt != NULL );
+    pt = pc_point_from_double_array(schema, before_point_data, 4);
+    after_point_data = pc_point_to_double_array(pt) ;
+
+    for(i; i< 4; ++i){
+        CU_ASSERT_DOUBLE_EQUAL(after_point_data[i], before_point_data[i], 0.0000001);
+    }
+    pc_point_free(pt);
+    free(after_point_data);
+
+
+}
 
 /* REGISTER ***********************************************************/
 
 CU_TestInfo point_tests[] = {
 	PC_TEST(test_point_hex_inout),
 	PC_TEST(test_point_access),
+    PC_TEST(test_point_and_double_array),
 	CU_TEST_INFO_NULL
 };
 
